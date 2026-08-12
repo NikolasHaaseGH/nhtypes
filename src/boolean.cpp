@@ -19,9 +19,9 @@ constexpr BooleanValue True = BooleanValue::True;
 constexpr BooleanValue False = BooleanValue::False;
 
 struct Bool {
-    template <typename> friend struct FastInt;
+    template <typename> friend struct Int;
     template <typename> friend struct SafeInt;
-    template <typename> friend struct FastDecimal;
+    template <typename> friend struct Decimal;
     template <typename> friend struct SafeDecimal;
 
     public:

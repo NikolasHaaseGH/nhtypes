@@ -198,7 +198,7 @@ namespace NH_NAMESPACE {
     };
 
     template <typename IntType>
-    struct FastInt : public IntBase<IntType> 
+    struct Int : public IntBase<IntType> 
     {
     private:
         typedef IntBase<IntType> Base;
@@ -206,18 +206,18 @@ namespace NH_NAMESPACE {
         using CType = IntType;
 
     public:
-        constexpr FastInt(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {
+        constexpr Int(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {
         }
-        constexpr FastInt(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
+        constexpr Int(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
         }
 
         template <typename Other>
         requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
-        constexpr operator FastInt<Other>() const { return static_cast<Other>(m_value); }
+        constexpr operator Int<Other>() const { return static_cast<Other>(m_value); }
 
         template <typename Other>
         requires(sizeof(Other) > sizeof(IntType) && std::is_unsigned_v<IntType> && std::is_signed_v<Other>)
-        constexpr operator FastInt<Other>() const { return static_cast<Other>(m_value); }
+        constexpr operator Int<Other>() const { return static_cast<Other>(m_value); }
 
         template <typename Other>
         requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
@@ -227,27 +227,27 @@ namespace NH_NAMESPACE {
         requires(sizeof(Other) > sizeof(IntType) && std::is_unsigned_v<IntType> && std::is_signed_v<Other>)
         constexpr operator SafeInt<Other>() const { return static_cast<Other>(m_value); }
 
-        constexpr FastInt & operator+=(FastInt rhs) { m_value += rhs.m_value; return *this;}
-        constexpr FastInt & operator-=(FastInt rhs) { m_value -= rhs.m_value; return *this;}
-        constexpr FastInt & operator/=(FastInt rhs) { m_value /= rhs.m_value; return *this;}
-        constexpr FastInt & operator*=(FastInt rhs) { m_value *= rhs.m_value; return *this;}
-        constexpr FastInt & operator%=(FastInt rhs) { m_value %= rhs.m_value; return *this;}
+        constexpr Int & operator+=(Int rhs) { m_value += rhs.m_value; return *this;}
+        constexpr Int & operator-=(Int rhs) { m_value -= rhs.m_value; return *this;}
+        constexpr Int & operator/=(Int rhs) { m_value /= rhs.m_value; return *this;}
+        constexpr Int & operator*=(Int rhs) { m_value *= rhs.m_value; return *this;}
+        constexpr Int & operator%=(Int rhs) { m_value %= rhs.m_value; return *this;}
 
-        constexpr FastInt & operator++() { ++m_value; return *this; }
-        constexpr FastInt & operator--() { --m_value; return *this; }
-        constexpr FastInt operator++(auto) { return m_value++; }
-        constexpr FastInt operator--(auto) { return m_value--; }
+        constexpr Int & operator++() { ++m_value; return *this; }
+        constexpr Int & operator--() { --m_value; return *this; }
+        constexpr Int operator++(auto) { return m_value++; }
+        constexpr Int operator--(auto) { return m_value--; }
 
-        constexpr FastInt operator~() ENABLE_IF_UNSIGNED(IntType) { return ~m_value; }
-        constexpr FastInt & operator&=(FastInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value &= rhs.m_value; return *this; }
-        constexpr FastInt & operator|=(FastInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value |= rhs.m_value; return *this; }
-        constexpr FastInt & operator^=(FastInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value ^= rhs.m_value; return *this; }
-        constexpr FastInt & operator<<=(FastInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value <<= rhs.m_value; return *this; }
-        constexpr FastInt & operator>>=(FastInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value >>= rhs.m_value; return *this; }
+        constexpr Int operator~() ENABLE_IF_UNSIGNED(IntType) { return ~m_value; }
+        constexpr Int & operator&=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value &= rhs.m_value; return *this; }
+        constexpr Int & operator|=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value |= rhs.m_value; return *this; }
+        constexpr Int & operator^=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value ^= rhs.m_value; return *this; }
+        constexpr Int & operator<<=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value <<= rhs.m_value; return *this; }
+        constexpr Int & operator>>=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value >>= rhs.m_value; return *this; }
 
-        FRIEND_COMPARISON_OPERATORS(FastInt)
-        FRIEND_ARITHMETIC_OPERATORS(FastInt)
-        FRIEND_BITWISE_OPERATORS(FastInt, IntType)
+        FRIEND_COMPARISON_OPERATORS(Int)
+        FRIEND_ARITHMETIC_OPERATORS(Int)
+        FRIEND_BITWISE_OPERATORS(Int, IntType)
 
         public:
             using Base::Max;
@@ -258,14 +258,14 @@ namespace NH_NAMESPACE {
 
 export namespace NH_NAMESPACE 
 {
-    using FastI8 = FastInt<int8_t>;
-    using FastI16 = FastInt<int16_t>;
-    using FastI32 = FastInt<int32_t>;
-    using FastI64 = FastInt<int64_t>;
-    using FastU8 = FastInt<uint8_t>;
-    using FastU16 = FastInt<uint16_t>;
-    using FastU32 = FastInt<uint32_t>;
-    using FastU64 = FastInt<uint64_t>;
+    using Int8 = Int<int8_t>;
+    using Int16 = Int<int16_t>;
+    using Int32 = Int<int32_t>;
+    using Int64 = Int<int64_t>;
+    using UInt8 = Int<uint8_t>;
+    using UInt16 = Int<uint16_t>;
+    using UInt32 = Int<uint32_t>;
+    using UInt64 = Int<uint64_t>;
 
     using SafeI8 = SafeInt<int8_t>;
     using SafeI16 = SafeInt<int16_t>;
@@ -287,23 +287,23 @@ export namespace NH_NAMESPACE
 #endif
 
 #if USE_64_BIT_PTR_DEFINES
-    using FastSize = FastU64;
+    using Size = UInt64;
     using SafeSize = SafeU64;
 #else 
-    using FastSize = FastU32;
+    using Size = UInt32;
     using SafeSize = SafeU32;
 #endif
 
-    //auto* operator+(auto * lhs, FastSize rhs) { return lhs + +rhs; }   \
-    //auto* operator-(auto * lhs, FastSize rhs) { return lhs - +rhs; }   
+    //auto* operator+(auto * lhs, Size rhs) { return lhs + +rhs; }   \
+    //auto* operator-(auto * lhs, Size rhs) { return lhs - +rhs; }   
     auto* operator+(auto * lhs, SafeSize rhs) { return lhs + +rhs; }   \
     auto* operator-(auto * lhs, SafeSize rhs) { return lhs - +rhs; }   
 }
 
 export namespace std {
     template <typename T>
-    struct hash<NH_NAMESPACE::FastInt<T>> {
-        size_t operator()(const NH_NAMESPACE::FastInt<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::Int<T>> {
+        size_t operator()(const NH_NAMESPACE::Int<T>& value) const noexcept {
             return +value;
         }
     };
