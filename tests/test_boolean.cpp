@@ -9,8 +9,9 @@ import nhtypes;
 
 TEST_CASE("Test boolean"){
     SECTION("Create booleans") {
-        nh::Bool a = 0;
-        nh::Bool b = 1;
-        nh::Bool c = 2;
+        nh::Bool a = nh::True;
+        nh::Bool b = nh::False;
+
+        if(a) {}
     }
 }

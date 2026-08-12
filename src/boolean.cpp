@@ -6,12 +6,17 @@ export module nhtypes:boolean;
 
 import :common;
 
+namespace NH_NAMESPACE {
+    enum class BooleanValue : uint8_t {
+        False = 0,
+        True = 1
+    };
+}
+
 export namespace NH_NAMESPACE {
 
-enum class BooleanValue : bool {
-    False = 0,
-    True = 1
-};
+constexpr BooleanValue True = BooleanValue::True;
+constexpr BooleanValue False = BooleanValue::False;
 
 struct Bool {
     template <typename> friend struct FastInt;
@@ -21,10 +26,8 @@ struct Bool {
 
     public:
 
-        inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
+        //inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
 
-        static constexpr BooleanValue True = BooleanValue::True;
-        static constexpr BooleanValue False = BooleanValue::False;
 
         inline constexpr Bool(const BooleanValue value = False) noexcept : m_value(value) {}
 

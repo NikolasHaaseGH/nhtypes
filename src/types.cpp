@@ -8,7 +8,7 @@ export import :common;
 export import :boolean;
 export import :integers;
 export import :decimals;
-export import :type_traits;
+//export import :type_traits;
 
 export namespace NH_NAMESPACE {
 

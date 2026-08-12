@@ -139,16 +139,16 @@ private:
     {
         const ValueType diff = fabs(first - second);
         if (diff <= maxDiff)
-            return Bool::True;
+            return True;
 
         const ValueType a = fabs(first);
         const ValueType b = fabs(second);
         const ValueType largest = (b > a) ? b : a;
 
         if (diff <= largest * EPSILON)
-            return Bool::True;
+            return True;
 
-        return Bool::False;
+        return False;
     }
 };
 
