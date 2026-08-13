@@ -23,9 +23,7 @@ struct Bool {
     template <typename> friend struct SafeDecimal;
 
     public:
-
-        //inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
-
+        explicit inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
 
         inline constexpr Bool(const BooleanValue value = False) noexcept : m_value(value) {}
 
