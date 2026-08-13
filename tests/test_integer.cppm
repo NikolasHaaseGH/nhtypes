@@ -11,17 +11,17 @@ using namespace nh;
 
 TEST_CASE("Convert between integer types") {
   SECTION("Signed to signed") {
-    FastI8 fi8 = FastI8();
-    FastI16 fi16 = FastI8();
-    FastI32 fi32 = FastI16();
-    FastI64 fi64 = FastI32();
-    FastI64 fi64_ = FastI64();
+    Int8 fi8 = Int8();
+    Int16 fi16 = Int8();
+    Int32 fi32 = Int16();
+    Int64 fi64 = Int32();
+    Int64 fi64_ = Int64();
 
-    SafeI8 si8 = FastI8();
-    SafeI16 si16 = FastI8();
-    SafeI32 si32 = FastI16();
-    SafeI64 si64 = FastI32();
-    SafeI64 si64_ = FastI64();
+    SafeI8 si8 = Int8();
+    SafeI16 si16 = Int8();
+    SafeI32 si32 = Int16();
+    SafeI64 si64 = Int32();
+    SafeI64 si64_ = Int64();
 
     SafeI8 si8_ = SafeI8();
     SafeI16 si16_ = SafeI8();
@@ -36,13 +36,13 @@ TEST_CASE("Convert between integer types") {
   }
 
   SECTION("Unsigned to signed") {
-    FastI16 fi16 = FastU8();
-    FastI32 fi32 = FastU8();
-    FastI64 fi64 = FastU32();
+    Int16 fi16 = UInt8();
+    Int32 fi32 = UInt8();
+    Int64 fi64 = UInt32();
 
-    SafeI16 si16 = FastU8();
-    SafeI32 si32 = FastU16();
-    SafeI64 si64 = FastU32();
+    SafeI16 si16 = UInt8();
+    SafeI32 si32 = UInt16();
+    SafeI64 si64 = UInt32();
 
     SafeI16 si16_ = SafeU8();
     SafeI32 si32_ = SafeU16();

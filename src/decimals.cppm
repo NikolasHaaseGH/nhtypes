@@ -153,7 +153,7 @@ private:
 };
 
 template <typename ValueType>
-struct FastDecimal : public DecimalBase<ValueType>
+struct Decimal : public DecimalBase<ValueType>
 {
     using CType = ValueType;
 
@@ -162,11 +162,11 @@ private:
     using Base::m_value;
 
 public:
-    constexpr inline FastDecimal(ValueType value = 0) : Base(value) {}
+    constexpr inline Decimal(ValueType value = 0) : Base(value) {}
     
     template <typename Other>
     requires (sizeof(Other) >= sizeof(ValueType))
-    constexpr inline operator FastDecimal<Other>() { return m_value; }
+    constexpr inline operator Decimal<Other>() { return m_value; }
 
     template <typename Other>
     requires (sizeof(Other) >= sizeof(ValueType))
@@ -174,61 +174,61 @@ public:
 
     template <typename IntType>
     requires(sizeof(IntType) * 8 <= std::numeric_limits<ValueType>::digits)
-    constexpr FastDecimal(FastInt<IntType> value) : Base(+value) {}
+    constexpr Decimal(Int<IntType> value) : Base(+value) {}
 
     template <typename IntType>
     requires(sizeof(IntType) * 8 >= std::numeric_limits<ValueType>::digits)
-    constexpr operator FastInt<IntType>() { return m_value; }
+    constexpr operator Int<IntType>() { return m_value; }
 
-    constexpr inline Bool operator==(FastDecimal rhs) const noexcept { return m_value == rhs.m_value; }
-    constexpr inline Bool operator!=(FastDecimal rhs) const noexcept { return m_value != rhs.m_value; }
-    constexpr inline Bool operator<(FastDecimal rhs) const noexcept { return m_value < rhs.m_value; }
-    constexpr inline Bool operator>(FastDecimal rhs) const noexcept { return m_value > rhs.m_value; }
-    constexpr inline Bool operator<=(FastDecimal rhs) const noexcept { return m_value <= rhs.m_value; }
-    constexpr inline Bool operator>=(FastDecimal rhs) const noexcept { return m_value >= rhs.m_value; }
+    constexpr inline Bool operator==(Decimal rhs) const noexcept { return m_value == rhs.m_value; }
+    constexpr inline Bool operator!=(Decimal rhs) const noexcept { return m_value != rhs.m_value; }
+    constexpr inline Bool operator<(Decimal rhs) const noexcept { return m_value < rhs.m_value; }
+    constexpr inline Bool operator>(Decimal rhs) const noexcept { return m_value > rhs.m_value; }
+    constexpr inline Bool operator<=(Decimal rhs) const noexcept { return m_value <= rhs.m_value; }
+    constexpr inline Bool operator>=(Decimal rhs) const noexcept { return m_value >= rhs.m_value; }
 
-    constexpr inline FastDecimal & operator%=(FastDecimal rhs) noexcept {
+    constexpr inline Decimal & operator%=(Decimal rhs) noexcept {
         m_value = m_value % rhs.m_value;
         return *this;
     }
 
-    constexpr inline FastDecimal & operator+=(FastDecimal rhs) noexcept {
+    constexpr inline Decimal & operator+=(Decimal rhs) noexcept {
         m_value = m_value + rhs.m_value;
         return *this;
     };
 
-    constexpr inline FastDecimal & operator-=(FastDecimal rhs) noexcept {
+    constexpr inline Decimal & operator-=(Decimal rhs) noexcept {
         m_value = m_value - rhs.m_value;
         return *this;
     };
 
-    constexpr inline FastDecimal & operator/=(FastDecimal rhs) noexcept {
+    constexpr inline Decimal & operator/=(Decimal rhs) noexcept {
         m_value = m_value / rhs.m_value;
         return *this;
     };
 
-    constexpr inline FastDecimal & operator*=(FastDecimal rhs) noexcept {
+    constexpr inline Decimal & operator*=(Decimal rhs) noexcept {
         m_value = m_value * rhs.m_value;
         return *this;
     };
 
-    FRIEND_ARITHMETIC_OPERATORS(FastDecimal)
+    FRIEND_ARITHMETIC_OPERATORS(Decimal)
 };
 
 }
 
 export namespace NH_NAMESPACE 
 {
-    using FastFloat = FastDecimal<float>;
-    using FastDouble = FastDecimal<double>;
+    using Float = Decimal<float>;
+    using Double = Decimal<double>;
     using SafeFloat = SafeDecimal<float>;
     using SafeDouble = SafeDecimal<double>;
 }
 
 export namespace std {
     template <typename T>
-    struct hash<NH_NAMESPACE::FastDecimal<T>> {
-        size_t operator()(const NH_NAMESPACE::FastDecimal<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::Decimal<T>> {
+        size_t operator()(const NH_NAMESPACE::Decimal<T>& value) const noexcept {
             return +value;
         }
     };

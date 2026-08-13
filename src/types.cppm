@@ -18,14 +18,14 @@ concept isHeliumInteger =
     std::is_same_v<T, SafeI32> || std::is_same_v<T, SafeI64> ||
     std::is_same_v<T, SafeU8> || std::is_same_v<T, SafeU16> ||
     std::is_same_v<T, SafeU32> || std::is_same_v<T, SafeU64> ||
-    std::is_same_v<T, FastI8> || std::is_same_v<T, FastI16> ||
-    std::is_same_v<T, FastI32> || std::is_same_v<T, FastI64> ||
-    std::is_same_v<T, FastU8> || std::is_same_v<T, FastU16> ||
-    std::is_same_v<T, FastU32> || std::is_same_v<T, FastU64>;
+    std::is_same_v<T, Int8> || std::is_same_v<T, Int16> ||
+    std::is_same_v<T, Int32> || std::is_same_v<T, Int64> ||
+    std::is_same_v<T, UInt8> || std::is_same_v<T, UInt16> ||
+    std::is_same_v<T, UInt32> || std::is_same_v<T, UInt64>;
 
 template <typename T>
 concept isHeliumDecimal =
-    std::is_same_v<T, FastFloat> || std::is_same_v<T, FastDouble> ||
+    std::is_same_v<T, Float> || std::is_same_v<T, Double> ||
     std::is_same_v<T, SafeFloat> || std::is_same_v<T, SafeDouble>;
 
 template <typename T>
