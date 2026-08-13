@@ -288,10 +288,10 @@ export namespace NH_NAMESPACE
 
 #if USE_64_BIT_PTR_DEFINES
     using Size = UInt64;
-    using SafeSize = SafeU64;
+    using SafeSize = SafeUInt64;
 #else 
     using Size = UInt32;
-    using SafeSize = SafeU32;
+    using SafeSize = SafeUInt32;
 #endif
 
     //auto* operator+(auto * lhs, Size rhs) { return lhs + +rhs; }   \

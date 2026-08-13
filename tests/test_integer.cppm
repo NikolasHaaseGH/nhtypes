@@ -17,17 +17,17 @@ TEST_CASE("Convert between integer types") {
     Int64 fi64 = Int32();
     Int64 fi64_ = Int64();
 
-    SafeI8 si8 = Int8();
-    SafeI16 si16 = Int8();
-    SafeI32 si32 = Int16();
-    SafeI64 si64 = Int32();
-    SafeI64 si64_ = Int64();
+    SafeInt8 si8 = Int8();
+    SafeInt16 si16 = Int8();
+    SafeInt32 si32 = Int16();
+    SafeInt64 si64 = Int32();
+    SafeInt64 si64_ = Int64();
 
-    SafeI8 si8_ = SafeI8();
-    SafeI16 si16_ = SafeI8();
-    SafeI32 si32_ = SafeI16();
-    SafeI64 si64__ = SafeI32();
-    SafeI64 si64___ = SafeI64();
+    SafeInt8 si8_ = SafeInt8();
+    SafeInt16 si16_ = SafeInt8();
+    SafeInt32 si32_ = SafeInt16();
+    SafeInt64 si64__ = SafeInt32();
+    SafeInt64 si64___ = SafeInt64();
   }
 
   SECTION("Unsigned to unsigned") {
@@ -40,13 +40,13 @@ TEST_CASE("Convert between integer types") {
     Int32 fi32 = UInt8();
     Int64 fi64 = UInt32();
 
-    SafeI16 si16 = UInt8();
-    SafeI32 si32 = UInt16();
-    SafeI64 si64 = UInt32();
+    SafeInt16 si16 = UInt8();
+    SafeInt32 si32 = UInt16();
+    SafeInt64 si64 = UInt32();
 
-    SafeI16 si16_ = SafeU8();
-    SafeI32 si32_ = SafeU16();
-    SafeI64 si64_ = SafeU32();
+    SafeInt16 si16_ = SafeUInt8();
+    SafeInt32 si32_ = SafeUInt16();
+    SafeInt64 si64_ = SafeUInt32();
   }
 }
 
@@ -122,12 +122,12 @@ TEST_CASE("Convert between integer types") {
     REQUIRE_FALSE(Type(0));                                                    \
   }
 
-Make_Unsigned_Integer_Tests(SafeU8, uint8_t);
-Make_Unsigned_Integer_Tests(SafeU16, uint16_t);
-Make_Unsigned_Integer_Tests(SafeU32, uint32_t);
-Make_Unsigned_Integer_Tests(SafeU64, uint64_t);
+Make_Unsigned_Integer_Tests(SafeUInt8, uint8_t);
+Make_Unsigned_Integer_Tests(SafeUInt16, uint16_t);
+Make_Unsigned_Integer_Tests(SafeUInt32, uint32_t);
+Make_Unsigned_Integer_Tests(SafeUInt64, uint64_t);
 
-Make_Signed_Integer_Tests(SafeI8, int8_t);
-Make_Signed_Integer_Tests(SafeI16, int16_t);
-Make_Signed_Integer_Tests(SafeI32, int32_t);
-Make_Signed_Integer_Tests(SafeI64, int64_t);
+Make_Signed_Integer_Tests(SafeInt8, int8_t);
+Make_Signed_Integer_Tests(SafeInt16, int16_t);
+Make_Signed_Integer_Tests(SafeInt32, int32_t);
+Make_Signed_Integer_Tests(SafeInt64, int64_t);

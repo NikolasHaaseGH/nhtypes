@@ -14,10 +14,10 @@ export namespace NH_NAMESPACE {
 
 template <typename T>
 concept isHeliumInteger =
-    std::is_same_v<T, SafeI8> || std::is_same_v<T, SafeI16> ||
-    std::is_same_v<T, SafeI32> || std::is_same_v<T, SafeI64> ||
-    std::is_same_v<T, SafeU8> || std::is_same_v<T, SafeU16> ||
-    std::is_same_v<T, SafeU32> || std::is_same_v<T, SafeU64> ||
+    std::is_same_v<T, SafeInt8> || std::is_same_v<T, SafeInt16> ||
+    std::is_same_v<T, SafeInt32> || std::is_same_v<T, SafeInt64> ||
+    std::is_same_v<T, SafeUInt8> || std::is_same_v<T, SafeUInt16> ||
+    std::is_same_v<T, SafeUInt32> || std::is_same_v<T, SafeUInt64> ||
     std::is_same_v<T, Int8> || std::is_same_v<T, Int16> ||
     std::is_same_v<T, Int32> || std::is_same_v<T, Int64> ||
     std::is_same_v<T, UInt8> || std::is_same_v<T, UInt16> ||
