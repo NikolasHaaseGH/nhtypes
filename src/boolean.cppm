@@ -13,10 +13,6 @@ enum class BooleanValue : uint8_t {
     True = 1
 };
 
-
-constexpr BooleanValue True = BooleanValue::True;
-constexpr BooleanValue False = BooleanValue::False;
-
 struct Bool {
     template <typename> friend struct Int;
     template <typename> friend struct SafeInt;
@@ -28,7 +24,7 @@ struct Bool {
         //inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
 
 
-        inline constexpr Bool(const BooleanValue value = False) noexcept : m_value(value) {}
+        inline constexpr Bool(const BooleanValue value = BooleanValue::False) noexcept : m_value(value) {}
 
         inline constexpr Bool & operator &=(Bool rhs) noexcept { m_value = static_cast<BooleanValue>(static_cast<bool>(m_value) & static_cast<bool>(rhs.m_value)); return *this; }
         inline constexpr Bool & operator |=(Bool rhs) noexcept { m_value = static_cast<BooleanValue>(static_cast<bool>(m_value) | static_cast<bool>(rhs.m_value)); return *this; }
