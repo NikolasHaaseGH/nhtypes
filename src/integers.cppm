@@ -267,14 +267,14 @@ export namespace NH_NAMESPACE
     using UInt32 = Int<uint32_t>;
     using UInt64 = Int<uint64_t>;
 
-    using SafeI8 = SafeInt<int8_t>;
-    using SafeI16 = SafeInt<int16_t>;
-    using SafeI32 = SafeInt<int32_t>;
-    using SafeI64 = SafeInt<int64_t>;
-    using SafeU8 = SafeInt<uint8_t>;
-    using SafeU16 = SafeInt<uint16_t>;
-    using SafeU32 = SafeInt<uint32_t>;
-    using SafeU64 = SafeInt<uint64_t>;
+    using SafeInt8 = SafeInt<int8_t>;
+    using SafeInt16 = SafeInt<int16_t>;
+    using SafeInt32 = SafeInt<int32_t>;
+    using SafeInt64 = SafeInt<int64_t>;
+    using SafeUInt8 = SafeInt<uint8_t>;
+    using SafeUInt16 = SafeInt<uint16_t>;
+    using SafeUInt32 = SafeInt<uint32_t>;
+    using SafeUInt64 = SafeInt<uint64_t>;
 
 #ifndef USE_64_BIT_PTR_DEFINES
 #    if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) \
