@@ -11,7 +11,10 @@ import :boolean;
 #define ENABLE_IF_UNSIGNED(Type) requires(std::is_unsigned_v<Type>)
 #define ENABLE_IF_SIGNED(Type) requires(std::is_signed_v<Type>)
 
-namespace NH_NAMESPACE {
+export namespace NH_NAMESPACE {
+
+#define FRIEND_OVERFLOW_FUNCTIONS(Type) \
+    friend constexpr Type OverflowAddition(Type lhs, Type rhs) { return (+lhs) + (+rhs); }
 
 #define FRIEND_COMPARISON_OPERATORS(Type)                                         \
     friend constexpr bool operator==(Type lhs, Type rhs) { return +lhs == +rhs; } \
@@ -39,8 +42,8 @@ namespace NH_NAMESPACE {
     struct IntBase {
         constexpr inline IntBase(IntType value = 0) : m_value(value) {}
 
-        explicit constexpr inline operator IntType() const { return m_value; }
-        constexpr inline IntType operator+() const { return m_value; }
+        explicit constexpr inline operator IntType() const noexcept { return m_value; }
+        constexpr inline IntType operator+() const noexcept { return m_value; }
 
         static constexpr IntType Max = std::numeric_limits<IntType>::max();
         static constexpr IntType Min = std::numeric_limits<IntType>::min();
@@ -275,6 +278,7 @@ export namespace NH_NAMESPACE
     using SafeUInt16 = SafeInt<uint16_t>;
     using SafeUInt32 = SafeInt<uint32_t>;
     using SafeUInt64 = SafeInt<uint64_t>;
+
 
 #ifndef USE_64_BIT_PTR_DEFINES
 #    if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) \

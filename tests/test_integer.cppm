@@ -2,10 +2,12 @@ module;
 
 #include "catch2/catch_test_macros.hpp"
 #include <limits>
+#include <iostream>
 
 export module test.integer;
 
 import nhtypes;
+import nhtypes.overflow;
 
 using namespace nh;
 
@@ -28,6 +30,12 @@ TEST_CASE("Convert between integer types") {
     SafeInt32 si32_ = SafeInt16();
     SafeInt64 si64__ = SafeInt32();
     SafeInt64 si64___ = SafeInt64();
+
+    Int32 a = 2'147'483'64;
+    UInt32 b = 1;
+    OverflowAddition(a, b);
+    //UInt32 maxi2 = maxi;
+    std::cout << "HUNNY: "<< +maxi << std::endl;
   }
 
   SECTION("Unsigned to unsigned") {
