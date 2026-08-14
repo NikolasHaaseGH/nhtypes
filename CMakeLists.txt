@@ -16,7 +16,6 @@ set(MODULES
     "src/decimals.cppm"
     "src/integers.cppm"
     "src/stream.cppm" 
-    "src/overflow.cppm"
 )
 
 add_library(${PROJECT_NAME})
