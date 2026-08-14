@@ -2,7 +2,7 @@ project(UnitTests)
 
 add_subdirectory(external/catch2)
 
-set(TEST_MODULES "test_boolean.cppm" "test_decimal.cppm" "test_integer.cppm")
+set(TEST_MODULES "test_boolean.cppm" "test_decimal.cppm" "test_integer.cppm" "test_stream.cppm")
 
 set(TEST_INCLUDE_DIRS "external/catch2/src")
 

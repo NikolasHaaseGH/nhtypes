@@ -39,12 +39,12 @@ namespace NH_NAMESPACE {
     struct IntBase {
         constexpr inline IntBase(IntType value = 0) : m_value(value) {}
 
-        constexpr inline IntType operator+() const { return m_value; }
         explicit constexpr inline operator IntType() const { return m_value; }
+        constexpr inline IntType operator+() const { return m_value; }
 
         static constexpr IntType Max = std::numeric_limits<IntType>::max();
         static constexpr IntType Min = std::numeric_limits<IntType>::min();
-    public:
+
         IntType m_value;
     };
 

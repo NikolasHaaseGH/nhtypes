@@ -9,7 +9,7 @@ project(
   DESCRIPTION "Introduces Integers/Decimals and Booleans with runtime error checking"
   LANGUAGES CXX)
 
-set(MODULES "src/types.cppm" "src/common.cppm" "src/boolean.cppm" "src/decimals.cppm" "src/integers.cppm")
+set(MODULES "src/types.cppm" "src/common.cppm" "src/boolean.cppm" "src/decimals.cppm" "src/integers.cppm" "src/stream.cppm")
 
 add_library(${PROJECT_NAME})
 
