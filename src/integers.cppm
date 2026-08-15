@@ -55,12 +55,12 @@ export namespace NH_NAMESPACE {
         requires(sizeof(Other) > sizeof(T) && IS_UNSIGNED<T> && IS_SIGNED<Other>)
         constexpr operator BasicInt<Other, ArithmeticPolicy>() const { return static_cast<Other>(value); }
 
-        friend constexpr Bool operator==(BasicInt lhs, BasicInt rhs) { return +lhs == +rhs; }
-        friend constexpr Bool operator!=(BasicInt lhs, BasicInt rhs) { return +lhs != +rhs; }
-        friend constexpr Bool operator<(BasicInt lhs, BasicInt rhs) { return +lhs < +rhs; }
-        friend constexpr Bool operator>(BasicInt lhs, BasicInt rhs) { return +lhs > +rhs; }
-        friend constexpr Bool operator>=(BasicInt lhs, BasicInt rhs) { return +lhs >= +rhs; }
-        friend constexpr Bool operator<=(BasicInt lhs, BasicInt rhs) { return +lhs <= +rhs; }
+        friend constexpr Bool operator==(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs == +rhs); }
+        friend constexpr Bool operator!=(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs != +rhs); }
+        friend constexpr Bool operator<(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs < +rhs); }
+        friend constexpr Bool operator>(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs > +rhs); }
+        friend constexpr Bool operator>=(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs >= +rhs);}
+        friend constexpr Bool operator<=(BasicInt lhs, BasicInt rhs) { return static_cast<Bool>(+lhs <= +rhs); }
 
         constexpr BasicInt & operator++() { return ArithmeticPolicy::PreIncrement(*this); }
         constexpr BasicInt & operator--() { return ArithmeticPolicy::PreDecrement(*this); }

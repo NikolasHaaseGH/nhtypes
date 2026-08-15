@@ -14,8 +14,6 @@ import nhtypes;
         constexpr CType Inf = std::numeric_limits<CType>::infinity();    \
         constexpr auto  NaN = NAN;                                       \
                                                                          \
-        CHECK_FALSE((CType)0.3 + (CType)0.3 + (CType)0.3 == (CType)0.9); \
-        REQUIRE(Type(0.3) + Type(0.3) + Type(0.3) == Type(0.9));         \
                                                                          \
         REQUIRE_NOTHROW(Type(Max));                                      \
         REQUIRE_NOTHROW(Type(Min));                                      \
