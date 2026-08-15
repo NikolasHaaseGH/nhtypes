@@ -12,7 +12,7 @@ using namespace nh;
 
 TEST_CASE("stream types") {
 
-    Int8 i32 = 42;
+    Int8 i32 =42;
 
     std::stringstream ss;
     ss << i32;
