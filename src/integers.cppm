@@ -58,6 +58,7 @@ export namespace NH_NAMESPACE {
         typedef IntBase<IntType> Base;
         using Base::m_value;
         using CType = IntType;
+        static constexpr int bit_width = std::numeric_limits<IntType>::digits;
     
     public:      
         constexpr inline SafeInt(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
@@ -121,9 +122,8 @@ export namespace NH_NAMESPACE {
         }
 
         constexpr SafeInt & operator-=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const IntType result = m_value - rhs.m_value; 
-            Assert(result <= m_value); // result > m_value -> overflow
-            m_value = result; 
+            Assert(m_value >= rhs.m_value);
+            m_value -= rhs.m_value;
             return *this;
         }
 
@@ -139,7 +139,7 @@ export namespace NH_NAMESPACE {
 
         constexpr SafeInt & operator/=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) {
             Assert(rhs.m_value != 0);
-            m_value = m_value / rhs.m_value; 
+            m_value /= rhs.m_value; 
             return *this;
         }
 
@@ -148,15 +148,15 @@ export namespace NH_NAMESPACE {
                 rhs.m_value == 0 || (rhs.m_value == -1 && m_value == Min)
             };
             Assert(!didOverflow);
-            m_value *= rhs.m_value;
+            m_value /= rhs.m_value;
             return *this; 
         }
 
         constexpr SafeInt & operator*=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) {
-            const IntType result = m_value * rhs.m_value;
-            const bool didOverflow = result < m_value && rhs.m_value != 0;
-            Assert(!didOverflow);
-            m_value = result; 
+            if (rhs.m_value != 0)
+                Assert(m_value <= Max / rhs.m_value);
+
+            m_value *= rhs.m_value;
             return *this;
         }
 
@@ -178,15 +178,14 @@ export namespace NH_NAMESPACE {
         constexpr SafeInt & operator^=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value ^= rhs.m_value; return *this; }
 
         constexpr SafeInt & operator<<=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const bool didOverflow = rhs.m_value >= sizeof(IntType)*8;
-            Assert(!didOverflow);
+            Assert(rhs.m_value < bit_width);
+            Assert(m_value <= Max >> rhs.m_value);
             m_value <<= rhs.m_value;
             return *this;
         }
 
         constexpr SafeInt & operator>>=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const bool didOverflow = rhs.m_value >= sizeof(IntType)*8;
-            Assert(!didOverflow);
+            Assert(rhs < bit_width);
             m_value >>= rhs.m_value;
             return *this;
         }
@@ -209,10 +208,8 @@ export namespace NH_NAMESPACE {
         using CType = IntType;
 
     public:
-        constexpr Int(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {
-        }
-        constexpr Int(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
-        }
+        constexpr Int(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {}
+        constexpr Int(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {}
 
         template <typename Other>
         requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
