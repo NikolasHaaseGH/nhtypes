@@ -306,9 +306,6 @@ export namespace NH_NAMESPACE
     using SafeUInt16 = BasicInt<uint16_t, CheckedIntegerArithmetic>;
     using SafeUInt32 = BasicInt<uint32_t, CheckedIntegerArithmetic>;
     using SafeUInt64 = BasicInt<uint64_t, CheckedIntegerArithmetic>;
-
-    template <Int8 I>
-    class A {};
 }
 
 export namespace std {
