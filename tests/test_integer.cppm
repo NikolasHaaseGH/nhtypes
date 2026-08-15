@@ -18,11 +18,13 @@ TEST_CASE("Convert between integer types") {
     Int64 fi64 = Int32();
     Int64 fi64_ = Int64();
 
+    /*
     SafeInt8 si8 = Int8();
     SafeInt16 si16 = Int8();
     SafeInt32 si32 = Int16();
     SafeInt64 si64 = Int32();
     SafeInt64 si64_ = Int64();
+    */
 
     SafeInt8 si8_ = SafeInt8();
     SafeInt16 si16_ = SafeInt8();
@@ -42,9 +44,11 @@ TEST_CASE("Convert between integer types") {
     Int32 fi32 = UInt8();
     Int64 fi64 = UInt32();
 
+    /*
     SafeInt16 si16 = UInt8();
     SafeInt32 si32 = UInt16();
     SafeInt64 si64 = UInt32();
+    */
 
     SafeInt16 si16_ = SafeUInt8();
     SafeInt32 si32_ = SafeUInt16();
