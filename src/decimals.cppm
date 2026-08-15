@@ -10,13 +10,14 @@ import :common;
 import :integers;
 import :boolean;
 
-namespace NH_NAMESPACE {
+template <typename T>
+concept Decimal = std::is_floating_point_v<T>;
 
-    template <typename T>
-    concept Decimal = std::is_floating_point_v<T>;
+template <typename T>
+concept PolicySuitable = std::is_empty_v<T>;
 
-    template <typename T>
-    concept PolicySuitable = std::is_empty_v<T>;
+
+export namespace NH_NAMESPACE {
 
     template <typename T, PolicySuitable ArithmeticPolicy>
     struct BasicDecimal {
@@ -28,7 +29,7 @@ namespace NH_NAMESPACE {
 
         template <typename Other>
         requires (sizeof(Other) >= sizeof(T))
-        constexpr inline operator BasicDecimal<T, ArithmeticPolicy>() { return value; }
+        constexpr inline operator BasicDecimal<Other, ArithmeticPolicy>() { return value; }
 
         /*
         template <typename IntType>
@@ -125,7 +126,7 @@ namespace NH_NAMESPACE {
         template<Decimal T>
         static constexpr T Modulo(T lhs, T rhs)
         {
-            Assert(rhs != T{0});
+            Assert(rhs != 0);
             return Check(std::fmod(lhs, rhs));
         }
 
@@ -135,28 +136,9 @@ namespace NH_NAMESPACE {
             return -value;
         }
     };
-}
 
-export namespace NH_NAMESPACE 
-{
     using Float = BasicDecimal<float, UncheckedDecimalArithmetic>;
     using Double = BasicDecimal<double, UncheckedDecimalArithmetic>;
     using SafeFloat = BasicDecimal<float, CheckedDecimalArithmetic>;
     using SafeDouble = BasicDecimal<double, CheckedDecimalArithmetic>;
-}
-
-export namespace std {
-    template <typename T>
-    struct hash<NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::UncheckedDecimalArithmetic>> {
-        size_t operator()(const NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::UncheckedDecimalArithmetic>& value) const noexcept {
-            return +value;
-        }
-    };
-
-    template <typename T>
-    struct hash<NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::CheckedDecimalArithmetic>> {
-        size_t operator()(const NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::CheckedDecimalArithmetic>& value) const noexcept {
-            return +value;
-        }
-    };
 }

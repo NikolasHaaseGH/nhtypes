@@ -8,19 +8,23 @@ export module nhtypes:integers;
 import :common;
 import :boolean;
 
-template <typename T>
-concept Integer =
-    std::is_integral_v<T> &&
-    !std::is_same_v<T, bool>;
+namespace NH_NAMESPACE {
 
-template <typename T>
-concept IS_UNSIGNED = std::is_unsigned_v<T>;
+    template <typename T>
+    concept Integer =
+        std::is_integral_v<T> &&
+        !std::is_same_v<T, bool>;
 
-template <typename T>
-concept IS_SIGNED = std::is_signed_v<T>;
+    template <typename T>
+    concept IS_UNSIGNED = std::is_unsigned_v<T>;
 
-template <typename T>
-concept PolicySuitable = std::is_empty_v<T>;
+    template <typename T>
+    concept IS_SIGNED = std::is_signed_v<T>;
+
+    template <typename T>
+    concept PolicySuitable = std::is_empty_v<T>;
+
+}
 
 export namespace NH_NAMESPACE {
 
@@ -285,41 +289,22 @@ export namespace NH_NAMESPACE {
         }
     };
 
+    using Int8 = BasicInt<std::int8_t, UncheckedIntegerArithmetic>;
+    using Int16 = BasicInt<std::int16_t, UncheckedIntegerArithmetic>;
+    using Int32 = BasicInt<std::int32_t, UncheckedIntegerArithmetic>;
+    using Int64 = BasicInt<std::int64_t, UncheckedIntegerArithmetic>;
+    using UInt8 = BasicInt<std::uint8_t, UncheckedIntegerArithmetic>;
+    using UInt16 = BasicInt<std::uint16_t, UncheckedIntegerArithmetic>;
+    using UInt32 = BasicInt<std::uint32_t, UncheckedIntegerArithmetic>;
+    using UInt64 = BasicInt<std::uint64_t, UncheckedIntegerArithmetic>;
+
+    using SafeInt8 = BasicInt<std::int8_t, CheckedIntegerArithmetic>;
+    using SafeInt16 = BasicInt<std::int16_t, CheckedIntegerArithmetic>;
+    using SafeInt32 = BasicInt<std::int32_t, CheckedIntegerArithmetic>;
+    using SafeInt64 = BasicInt<std::int64_t, CheckedIntegerArithmetic>;
+    using SafeUInt8 = BasicInt<std::uint8_t, CheckedIntegerArithmetic>;
+    using SafeUInt16 = BasicInt<std::uint16_t, CheckedIntegerArithmetic>;
+    using SafeUInt32 = BasicInt<std::uint32_t, CheckedIntegerArithmetic>;
+    using SafeUInt64 = BasicInt<std::uint64_t, CheckedIntegerArithmetic>;
 }
 
-export namespace NH_NAMESPACE 
-{
-    using Int8 = BasicInt<int8_t, UncheckedIntegerArithmetic>;
-    using Int16 = BasicInt<int16_t, UncheckedIntegerArithmetic>;
-    using Int32 = BasicInt<int32_t, UncheckedIntegerArithmetic>;
-    using Int64 = BasicInt<int64_t, UncheckedIntegerArithmetic>;
-    using UInt8 = BasicInt<uint8_t, UncheckedIntegerArithmetic>;
-    using UInt16 = BasicInt<uint16_t, UncheckedIntegerArithmetic>;
-    using UInt32 = BasicInt<uint32_t, UncheckedIntegerArithmetic>;
-    using UInt64 = BasicInt<uint64_t, UncheckedIntegerArithmetic>;
-
-    using SafeInt8 = BasicInt<int8_t, CheckedIntegerArithmetic>;
-    using SafeInt16 = BasicInt<int16_t, CheckedIntegerArithmetic>;
-    using SafeInt32 = BasicInt<int32_t, CheckedIntegerArithmetic>;
-    using SafeInt64 = BasicInt<int64_t, CheckedIntegerArithmetic>;
-    using SafeUInt8 = BasicInt<uint8_t, CheckedIntegerArithmetic>;
-    using SafeUInt16 = BasicInt<uint16_t, CheckedIntegerArithmetic>;
-    using SafeUInt32 = BasicInt<uint32_t, CheckedIntegerArithmetic>;
-    using SafeUInt64 = BasicInt<uint64_t, CheckedIntegerArithmetic>;
-}
-
-export namespace std {
-    template <typename T>
-    struct hash<NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::UncheckedIntegerArithmetic>> {
-        size_t operator()(const NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::UncheckedIntegerArithmetic>& value) const noexcept {
-            return +value;
-        }
-    };
-
-    template <typename T>
-    struct hash<NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::CheckedIntegerArithmetic>> {
-        size_t operator()(const NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::CheckedIntegerArithmetic>& value) const noexcept {
-            return +value;
-        }
-    };
-}

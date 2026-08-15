@@ -15,7 +15,8 @@ set(MODULES
     "src/boolean.cppm"
     "src/decimals.cppm"
     "src/integers.cppm"
-    # "src/stream.cppm" 
+     "src/stream.cppm" 
+     "src/hash.cppm" 
 )
 
 add_library(${PROJECT_NAME})
