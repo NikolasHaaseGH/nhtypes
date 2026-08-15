@@ -12,230 +12,150 @@ import :boolean;
 
 namespace NH_NAMESPACE {
 
-#define FRIEND_ARITHMETIC_OPERATORS(Type) \
-    friend Type operator+(Type lhs, Type rhs) { lhs += rhs; return lhs; } \
-    friend Type operator-(Type lhs, Type rhs) { lhs -= rhs; return lhs; } \
-    friend Type operator*(Type lhs, Type rhs) { lhs *= rhs; return lhs; } \
-    friend Type operator/(Type lhs, Type rhs) { lhs /= rhs; return lhs; } 
+    template <typename T>
+    concept Decimal = std::is_floating_point_v<T>;
 
+    template <typename T>
+    concept PolicySuitable = std::is_empty_v<T>;
 
-template <typename FloatingPointType>
-constexpr inline bool isInfinityOrNan(FloatingPointType value) noexcept
-{ 
-    return (fabs(value) == std::numeric_limits<FloatingPointType>::infinity()) || std::isnan(value);
-}
+    template <typename T, PolicySuitable ArithmeticPolicy>
+    struct BasicDecimal {
 
-template <typename ValueType>
-struct DecimalBase
-{
-    explicit operator ValueType() { return m_value; }
-    constexpr ValueType operator+() const { return m_value; }
+        constexpr BasicDecimal(T value = 0) : value(value) {}
 
-    ValueType m_value;
+        explicit constexpr operator T() const noexcept { return value; }
+        constexpr T operator+() const noexcept { return value; }
 
-    static constexpr ValueType Max = std::numeric_limits<ValueType>::max();
-    static constexpr ValueType Min = std::numeric_limits<ValueType>::min();
+        template <typename Other>
+        requires (sizeof(Other) >= sizeof(T))
+        constexpr inline operator BasicDecimal<T, ArithmeticPolicy>() { return value; }
 
-    DecimalBase(ValueType value = 0) : m_value(value) {}
-};
+        /*
+        template <typename IntType>
+        requires(sizeof(IntType) * 8 <= std::numeric_limits<T>::digits)
+        constexpr BasicDecimal(BasicInt<IntType> value) : Base(+value) {}
 
-template <typename ValueType>
-struct SafeDecimal : public DecimalBase<ValueType>
-{
-    using CType = ValueType;
+        template <typename IntType>
+        requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits)
+        constexpr operator BasicInt<IntType>() { return m_value; }
+        */
 
-private:
-    typedef DecimalBase<ValueType> Base;
-    using Base::m_value;
+        friend constexpr Bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return +lhs < +rhs; }
+        friend constexpr Bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return +lhs > +rhs; }
+        friend constexpr Bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return +lhs >= +rhs; }
+        friend constexpr Bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return +lhs <= +rhs; }
 
-public:
-    constexpr inline SafeDecimal(ValueType value = 0) noexcept : Base(value) {
-        Assert(!isInfinityOrNan(value));
+        friend constexpr BasicDecimal operator+(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Add(lhs.value, rhs.value); }
+        friend constexpr BasicDecimal operator-(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Subtract(lhs.value, rhs.value); }
+        friend constexpr BasicDecimal operator/(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Divide(lhs.value, rhs.value); }
+        friend constexpr BasicDecimal operator*(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Multiply(lhs.value, rhs.value); }
+        friend constexpr BasicDecimal operator%(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Modulo(lhs.value, rhs.value); }
+
+        constexpr BasicDecimal & operator+=(BasicDecimal other) { return *this = *this + other; }
+        constexpr BasicDecimal & operator-=(BasicDecimal other) { return *this = *this - other; }
+        constexpr BasicDecimal & operator/=(BasicDecimal other) { return *this = *this / other; }
+        constexpr BasicDecimal & operator*=(BasicDecimal other) { return *this = *this * other; }
+        constexpr BasicDecimal & operator%=(BasicDecimal other) { return *this = *this % other; }
+
+    private:
+        T value;
+
+        friend struct UncheckedDecimalArithmetic;
+        friend struct CheckedDecimalArithmetic;
     };
 
-    template <typename Other>
-    requires (sizeof(Other) >= sizeof(ValueType))
-    inline constexpr operator SafeDecimal<Other>() { return m_value; }
 
-    template <typename IntType>
-    requires(sizeof(IntType) * 8 <= std::numeric_limits<ValueType>::digits)
-    constexpr SafeDecimal(SafeInt<IntType> value) : Base(+value) {}
-
-    template <typename IntType>
-    requires(sizeof(IntType) * 8 >= std::numeric_limits<ValueType>::digits)
-    constexpr operator SafeInt<IntType>() { return m_value; }
-
-    // Assignemnt Operators
-    constexpr inline Bool operator==(SafeDecimal const &rhs) const noexcept {
-        return safeCompare(m_value, rhs.m_value);
-    }
-
-    constexpr inline Bool operator!=(SafeDecimal const &rhs) const noexcept {
-        return !safeCompare(m_value, rhs.m_value);
-    }
-
-    constexpr inline Bool operator<(SafeDecimal const &rhs) const noexcept {
-        return (m_value < rhs.m_value) && !safeCompare(m_value, rhs.m_value);
-    }
-
-    constexpr inline Bool operator>(SafeDecimal const &rhs) const noexcept {
-        return (m_value > rhs.m_value) && !safeCompare(m_value, rhs.m_value);
-    }
-
-    constexpr inline Bool operator<=(SafeDecimal const &rhs) const noexcept {
-        return (m_value <= rhs.m_value || safeCompare(m_value, rhs.m_value));
-    }
-
-    constexpr inline Bool operator>=(SafeDecimal const &rhs) const noexcept {
-        return (m_value >= rhs.m_value || safeCompare(m_value, rhs.m_value));
-    }
-
-    // Assignemnt Operators
-    constexpr inline SafeDecimal &operator%=(SafeDecimal const &rhs) noexcept {
-        m_value = m_value % rhs.m_value;
-        return *this;
-    }
-
-    constexpr inline SafeDecimal operator-() noexcept {        
-        m_value = -m_value;
-        return *this;
-    }
-
-    constexpr inline SafeDecimal &operator+=(SafeDecimal const &rhs) noexcept {  
-        const ValueType result = m_value + rhs.m_value;
-        Assert(!isInfinityOrNan(result));
-        m_value = result;
-        return *this;
-    }
-
-    constexpr inline SafeDecimal &operator-=(SafeDecimal const &rhs) noexcept {    
-        const ValueType result = m_value - rhs.m_value;
-        Assert(!isInfinityOrNan(result));
-        m_value = result;
-        return *this;
-    }
-
-    constexpr inline SafeDecimal &operator/=(SafeDecimal const &rhs) noexcept {
-        const ValueType result = m_value / rhs.m_value;
-        Assert(!isInfinityOrNan(result));
-        m_value = result;
-        return *this;
-    }
-
-    constexpr inline SafeDecimal &operator*=(SafeDecimal const &rhs) noexcept {
-        const ValueType result = m_value * rhs.m_value;
-        Assert(!isInfinityOrNan(result));
-        m_value = result;
-        return *this;
-    }
-
-    FRIEND_ARITHMETIC_OPERATORS(SafeDecimal)
-
-private:
-
-    static constexpr ValueType EPSILON = std::numeric_limits<ValueType>::epsilon();
-
-    static constexpr inline Bool safeCompare(ValueType first, ValueType second, ValueType maxDiff = EPSILON, ValueType maxRelDiff = EPSILON) noexcept 
+    struct UncheckedDecimalArithmetic
     {
-        const ValueType diff = fabs(first - second);
-        if (diff <= maxDiff)
-            return True;
+        template<typename ValueType>
+        static constexpr ValueType Add(ValueType lhs, ValueType rhs){ return lhs + rhs; }
 
-        const ValueType a = fabs(first);
-        const ValueType b = fabs(second);
-        const ValueType largest = (b > a) ? b : a;
+        template<typename ValueType>
+        static constexpr ValueType Subtract(ValueType lhs, ValueType rhs){ return lhs - rhs; }
 
-        if (diff <= largest * EPSILON)
-            return True;
+        template<typename ValueType>
+        static constexpr ValueType Multiply(ValueType lhs, ValueType rhs){ return lhs * rhs; }
 
-        return False;
-    }
-};
+        template<typename ValueType>
+        static constexpr ValueType Divide(ValueType lhs, ValueType rhs){ return lhs / rhs; }
 
-template <typename ValueType>
-struct Decimal : public DecimalBase<ValueType>
-{
-    using CType = ValueType;
+        template<typename ValueType>
+        static constexpr ValueType Modulo(ValueType lhs, ValueType rhs){ return lhs % rhs; }
 
-private:
-    typedef DecimalBase<ValueType> Base;
-    using Base::m_value;
-
-public:
-    constexpr inline Decimal(ValueType value = 0) : Base(value) {}
-    
-    template <typename Other>
-    requires (sizeof(Other) >= sizeof(ValueType))
-    constexpr inline operator Decimal<Other>() { return m_value; }
-
-    template <typename Other>
-    requires (sizeof(Other) >= sizeof(ValueType))
-    constexpr inline operator SafeDecimal<Other>() { return m_value; }
-
-    template <typename IntType>
-    requires(sizeof(IntType) * 8 <= std::numeric_limits<ValueType>::digits)
-    constexpr Decimal(Int<IntType> value) : Base(+value) {}
-
-    template <typename IntType>
-    requires(sizeof(IntType) * 8 >= std::numeric_limits<ValueType>::digits)
-    constexpr operator Int<IntType>() { return m_value; }
-
-    constexpr inline Bool operator==(Decimal rhs) const noexcept { return m_value == rhs.m_value; }
-    constexpr inline Bool operator!=(Decimal rhs) const noexcept { return m_value != rhs.m_value; }
-    constexpr inline Bool operator<(Decimal rhs) const noexcept { return m_value < rhs.m_value; }
-    constexpr inline Bool operator>(Decimal rhs) const noexcept { return m_value > rhs.m_value; }
-    constexpr inline Bool operator<=(Decimal rhs) const noexcept { return m_value <= rhs.m_value; }
-    constexpr inline Bool operator>=(Decimal rhs) const noexcept { return m_value >= rhs.m_value; }
-
-    constexpr inline Decimal & operator%=(Decimal rhs) noexcept {
-        m_value = m_value % rhs.m_value;
-        return *this;
-    }
-
-    constexpr inline Decimal & operator+=(Decimal rhs) noexcept {
-        m_value = m_value + rhs.m_value;
-        return *this;
+        template<typename ValueType>
+        static constexpr ValueType UnaryMinus(ValueType var){ return -var; }
     };
 
-    constexpr inline Decimal & operator-=(Decimal rhs) noexcept {
-        m_value = m_value - rhs.m_value;
-        return *this;
+    struct CheckedDecimalArithmetic
+    {
+    private:
+        template<Decimal T>
+        static constexpr T Check(T result)
+        {
+            Assert(std::isfinite(result));
+            return result;
+        }
+
+    public:
+        template<Decimal T>
+        static constexpr T Add(T lhs, T rhs)
+        {
+            return Check(lhs + rhs);
+        }
+
+        template<Decimal T>
+        static constexpr T Subtract(T lhs, T rhs)
+        {
+            return Check(lhs - rhs);
+        }
+
+        template<Decimal T>
+        static constexpr T Multiply(T lhs, T rhs)
+        {
+            return Check(lhs * rhs);
+        }
+
+        template<Decimal T>
+        static constexpr T Divide(T lhs, T rhs)
+        {
+            Assert(rhs != 0);
+            return Check(lhs / rhs);
+        }
+
+        template<Decimal T>
+        static constexpr T Modulo(T lhs, T rhs)
+        {
+            Assert(rhs != T{0});
+            return Check(std::fmod(lhs, rhs));
+        }
+
+        template<Decimal T>
+        static constexpr T UnaryMinus(T value)
+        {
+            return -value;
+        }
     };
-
-    constexpr inline Decimal & operator/=(Decimal rhs) noexcept {
-        m_value = m_value / rhs.m_value;
-        return *this;
-    };
-
-    constexpr inline Decimal & operator*=(Decimal rhs) noexcept {
-        m_value = m_value * rhs.m_value;
-        return *this;
-    };
-
-    FRIEND_ARITHMETIC_OPERATORS(Decimal)
-};
-
 }
 
 export namespace NH_NAMESPACE 
 {
-    using Float = Decimal<float>;
-    using Double = Decimal<double>;
-    using SafeFloat = SafeDecimal<float>;
-    using SafeDouble = SafeDecimal<double>;
+    using Float = BasicDecimal<float, UncheckedDecimalArithmetic>;
+    using Double = BasicDecimal<double, UncheckedDecimalArithmetic>;
+    using SafeFloat = BasicDecimal<float, CheckedDecimalArithmetic>;
+    using SafeDouble = BasicDecimal<double, CheckedDecimalArithmetic>;
 }
 
 export namespace std {
     template <typename T>
-    struct hash<NH_NAMESPACE::Decimal<T>> {
-        size_t operator()(const NH_NAMESPACE::Decimal<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::UncheckedDecimalArithmetic>> {
+        size_t operator()(const NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::UncheckedDecimalArithmetic>& value) const noexcept {
             return +value;
         }
     };
 
     template <typename T>
-    struct hash<NH_NAMESPACE::SafeDecimal<T>> {
-        size_t operator()(const NH_NAMESPACE::SafeDecimal<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::CheckedDecimalArithmetic>> {
+        size_t operator()(const NH_NAMESPACE::BasicDecimal<T, NH_NAMESPACE::CheckedDecimalArithmetic>& value) const noexcept {
             return +value;
         }
     };

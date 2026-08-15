@@ -4,7 +4,6 @@ module;
 
 export module nhtypes:boolean;
 
-import :common;
 
 export namespace NH_NAMESPACE {
 
@@ -17,27 +16,23 @@ constexpr BooleanValue True = BooleanValue::True;
 constexpr BooleanValue False = BooleanValue::False;
 
 struct Bool {
-    template <typename> friend struct Int;
-    template <typename> friend struct SafeInt;
-    template <typename> friend struct Decimal;
-    template <typename> friend struct SafeDecimal;
+        BooleanValue value;
 
-    public:
-        explicit inline constexpr Bool(bool value) noexcept : m_value(static_cast<BooleanValue>(value)) {}
+        explicit inline constexpr Bool(bool value) noexcept : value(static_cast<BooleanValue>(value)) {}
 
-        inline constexpr Bool(const BooleanValue value = False) noexcept : m_value(value) {}
+        inline constexpr Bool(const BooleanValue value = False) noexcept : value(value) {}
 
-        inline constexpr Bool & operator &=(Bool rhs) noexcept { m_value = static_cast<BooleanValue>(static_cast<bool>(m_value) & static_cast<bool>(rhs.m_value)); return *this; }
-        inline constexpr Bool & operator |=(Bool rhs) noexcept { m_value = static_cast<BooleanValue>(static_cast<bool>(m_value) | static_cast<bool>(rhs.m_value)); return *this; }
-        inline constexpr Bool & operator ^=(Bool rhs) noexcept { m_value = static_cast<BooleanValue>(static_cast<bool>(m_value) ^ static_cast<bool>(rhs.m_value)); return *this; }
+        inline constexpr Bool & operator &=(Bool rhs) noexcept { value = static_cast<BooleanValue>(static_cast<bool>(value) & static_cast<bool>(rhs.value)); return *this; }
+        inline constexpr Bool & operator |=(Bool rhs) noexcept { value = static_cast<BooleanValue>(static_cast<bool>(value) | static_cast<bool>(rhs.value)); return *this; }
+        inline constexpr Bool & operator ^=(Bool rhs) noexcept { value = static_cast<BooleanValue>(static_cast<bool>(value) ^ static_cast<bool>(rhs.value)); return *this; }
         
         friend inline constexpr Bool operator==(Bool lhs, Bool rhs)  noexcept { return static_cast<BooleanValue>(+lhs == +rhs); }
         friend inline constexpr Bool operator!=(Bool lhs, Bool rhs) noexcept { return static_cast<BooleanValue>(+lhs != +rhs); }
 
-        inline constexpr Bool operator!() const noexcept { return static_cast<BooleanValue>(!static_cast<bool>(m_value)); }
+        inline constexpr Bool operator!() const noexcept { return static_cast<BooleanValue>(!static_cast<bool>(value)); }
 
-        explicit inline constexpr operator bool() const noexcept { return static_cast<bool>(m_value); }
-        inline constexpr bool operator+() const noexcept { return static_cast<bool>(m_value); }
+        explicit inline constexpr operator bool() const noexcept { return static_cast<bool>(value); }
+        inline constexpr bool operator+() const noexcept { return static_cast<bool>(value); }
         
         Bool & operator +=(Bool rhs) = delete;
         Bool & operator -=(Bool rhs) = delete;
@@ -61,14 +56,7 @@ struct Bool {
         Bool operator >=(Bool rhs) = delete;
         Bool operator <=(Bool rhs) = delete;
         auto operator <=>(Bool rhs) = delete;        
-
-    private: 
-        BooleanValue m_value;
     };
-
-    //inline constexpr Bool operator&(Bool lhs, Bool rhs) noexcept { return lhs &= rhs; }
-    //inline constexpr Bool operator|(Bool lhs, Bool rhs) noexcept { return lhs |= rhs; }
-    //inline constexpr Bool operator^(Bool lhs, Bool rhs) noexcept { return lhs ^= rhs; }
 }
 
 export namespace std {

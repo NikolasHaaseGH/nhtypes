@@ -8,313 +8,320 @@ export module nhtypes:integers;
 import :common;
 import :boolean;
 
-#define ENABLE_IF_UNSIGNED(Type) requires(std::is_unsigned_v<Type>)
-#define ENABLE_IF_SIGNED(Type) requires(std::is_signed_v<Type>)
+template <typename T>
+concept Integer =
+    std::is_integral_v<T> &&
+    !std::is_same_v<T, bool>;
+
+template <typename T>
+concept IS_UNSIGNED = std::is_unsigned_v<T>;
+
+template <typename T>
+concept IS_SIGNED = std::is_signed_v<T>;
+
+template <typename T>
+concept PolicySuitable = std::is_empty_v<T>;
 
 export namespace NH_NAMESPACE {
 
-#define FRIEND_OVERFLOW_FUNCTIONS(Type) \
-    friend constexpr Type OverflowAddition(Type lhs, Type rhs) { return (+lhs) + (+rhs); }
+    template <Integer T, PolicySuitable ArithmeticPolicy>
+    struct BasicInt {
+        T value;
 
-#define FRIEND_COMPARISON_OPERATORS(Type)                                         \
-    friend constexpr bool operator==(Type lhs, Type rhs) { return +lhs == +rhs; } \
-    friend constexpr bool operator!=(Type lhs, Type rhs) { return +lhs != +rhs; } \
-    friend constexpr bool operator<(Type lhs, Type rhs) { return +lhs < +rhs; }   \
-    friend constexpr bool operator>(Type lhs, Type rhs) { return +lhs > +rhs; }   \
-    friend constexpr bool operator>=(Type lhs, Type rhs) { return +lhs >= +rhs; } \
-    friend constexpr bool operator<=(Type lhs, Type rhs) { return +lhs <= +rhs; }
+        constexpr BasicInt(T value = 0) : value(value) {}
 
-#define FRIEND_BITWISE_OPERATORS(Type, CType)                                                              \
-    friend constexpr Type operator&(Type lhs, Type rhs) ENABLE_IF_UNSIGNED(CType) { return lhs &= rhs; }   \
-    friend constexpr Type operator|(Type lhs, Type rhs) ENABLE_IF_UNSIGNED(CType) { return lhs |= rhs; }   \
-    friend constexpr Type operator^(Type lhs, Type rhs) ENABLE_IF_UNSIGNED(CType) { return lhs ^= rhs; }   \
-    friend constexpr Type operator<<(Type lhs, Type rhs) ENABLE_IF_UNSIGNED(CType) { return lhs <<= rhs; } \
-    friend constexpr Type operator>>(Type lhs, Type rhs) ENABLE_IF_UNSIGNED(CType) { return lhs >>= rhs; }  
+        explicit constexpr operator T() const noexcept { return value; }
+        constexpr T operator+() const noexcept { return value; }
 
-#define FRIEND_ARITHMETIC_OPERATORS(Type)                                      \
-    friend constexpr Type operator+(Type lhs, Type rhs) { return lhs += rhs; } \
-    friend constexpr Type operator-(Type lhs, Type rhs) { return lhs -= rhs; } \
-    friend constexpr Type operator/(Type lhs, Type rhs) { return lhs /= rhs; } \
-    friend constexpr Type operator*(Type lhs, Type rhs) { return lhs *= rhs; } \
-    friend constexpr Type operator%(Type lhs, Type rhs) { return lhs %= rhs; }
-
-    template <typename IntType>
-    struct IntBase {
-        constexpr inline IntBase(IntType value = 0) : m_value(value) {}
-
-        explicit constexpr inline operator IntType() const noexcept { return m_value; }
-        constexpr inline IntType operator+() const noexcept { return m_value; }
-
-        static constexpr IntType Max = std::numeric_limits<IntType>::max();
-        static constexpr IntType Min = std::numeric_limits<IntType>::min();
-
-        IntType m_value;
-    };
-
-    template <typename IntType>
-    struct SafeInt : public IntBase<IntType> 
-    {
-    private:
-        typedef IntBase<IntType> Base;
-        using Base::m_value;
-        using CType = IntType;
-    
-    public:      
-        constexpr inline SafeInt(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
-            Assert(value >= Min && value <= Max);
+        /*
+        constexpr inline BasicInt(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
+            Assert(value >= min && value <= max);
         }
 
         constexpr inline SafeInt(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {
-            Assert(value <= Max);
+            Assert(value <= max);
         }
+        */
 
         template <typename Other>
-        requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
-        constexpr operator SafeInt<Other>() const { return static_cast<Other>(m_value); }
+        requires(sizeof(Other) >= sizeof(T) && IS_SIGNED<T> == IS_SIGNED<Other>)
+        constexpr operator BasicInt<Other, ArithmeticPolicy>() const { return static_cast<Other>(value); }
 
         template <typename Other>
-        requires(sizeof(Other) > sizeof(IntType) && std::is_unsigned_v<IntType> && std::is_signed_v<Other>)
-        constexpr operator SafeInt<Other>() const { return static_cast<Other>(m_value); }
+        requires(sizeof(Other) > sizeof(T) && IS_UNSIGNED<T> && IS_SIGNED<Other>)
+        constexpr operator BasicInt<Other, ArithmeticPolicy>() const { return static_cast<Other>(value); }
 
-        constexpr SafeInt & operator++() {
-            Assert(m_value != Max);
-            ++m_value; return *this; 
-        }
+        friend constexpr Bool operator==(BasicInt lhs, BasicInt rhs) { return +lhs == +rhs; }
+        friend constexpr Bool operator!=(BasicInt lhs, BasicInt rhs) { return +lhs != +rhs; }
+        friend constexpr Bool operator<(BasicInt lhs, BasicInt rhs) { return +lhs < +rhs; }
+        friend constexpr Bool operator>(BasicInt lhs, BasicInt rhs) { return +lhs > +rhs; }
+        friend constexpr Bool operator>=(BasicInt lhs, BasicInt rhs) { return +lhs >= +rhs; }
+        friend constexpr Bool operator<=(BasicInt lhs, BasicInt rhs) { return +lhs <= +rhs; }
 
-        constexpr SafeInt & operator--() { 
-            Assert(m_value != Min);
-            --m_value; return *this; 
-        }
+        constexpr BasicInt & operator++() { return ArithmeticPolicy::PreIncrement(*this); }
+        constexpr BasicInt & operator--() { return ArithmeticPolicy::PreDecrement(*this); }
+        constexpr BasicInt operator++(auto) { return ArithmeticPolicy::PostIncrement(value); }
+        constexpr BasicInt operator--(auto) { return ArithmeticPolicy::PostDecrement(value); }
+        constexpr BasicInt operator-() const requires(IS_SIGNED<T>) { return ArithmeticPolicy::UnaryMinus(value); }
 
-        constexpr SafeInt operator++(auto) { 
-            Assert(m_value != Max);
-            return m_value++; 
-        }
+        friend constexpr BasicInt operator+(BasicInt lhs, BasicInt rhs) { return ArithmeticPolicy::Add(lhs.value, rhs.value); }
+        friend constexpr BasicInt operator-(BasicInt lhs, BasicInt rhs) { return ArithmeticPolicy::Subtract(lhs.value, rhs.value); }
+        friend constexpr BasicInt operator/(BasicInt lhs, BasicInt rhs) { return ArithmeticPolicy::Divide(lhs.value, rhs.value); }
+        friend constexpr BasicInt operator*(BasicInt lhs, BasicInt rhs) { return ArithmeticPolicy::Multiply(lhs.value, rhs.value); }
+        friend constexpr BasicInt operator%(BasicInt lhs, BasicInt rhs) { return ArithmeticPolicy::Modulo(lhs.value, rhs.value); }
 
-        constexpr SafeInt operator--(auto) { 
-            Assert(m_value != Min);
-            return m_value--; 
-        }
+        constexpr BasicInt operator~() const requires(IS_UNSIGNED<T>) { return ~value; }
+        constexpr BasicInt & operator<<=(BasicInt rhs) requires(IS_UNSIGNED<T>) { return ArithmeticPolicy::ShiftLeft(*this, rhs); }
+        constexpr BasicInt & operator>>=(BasicInt rhs) requires(IS_UNSIGNED<T>) { return ArithmeticPolicy::ShiftRight(*this, rhs); }
+        constexpr BasicInt & operator&=(BasicInt rhs) requires(IS_UNSIGNED<T>) { value &= rhs.value; return *this; }
+        constexpr BasicInt & operator|=(BasicInt rhs) requires(IS_UNSIGNED<T>) { value |= rhs.value; return *this; }
+        constexpr BasicInt & operator^=(BasicInt rhs) requires(IS_UNSIGNED<T>) { value ^= rhs.value; return *this; }
 
-        constexpr SafeInt & operator%=(SafeInt rhs) { m_value %= rhs.m_value; return *this;}
+        friend constexpr BasicInt operator&(BasicInt lhs, BasicInt rhs) requires(IS_UNSIGNED<T>) { return lhs &= rhs; }
+        friend constexpr BasicInt operator|(BasicInt lhs, BasicInt rhs) requires(IS_UNSIGNED<T>) { return lhs |= rhs; }
+        friend constexpr BasicInt operator^(BasicInt lhs, BasicInt rhs) requires(IS_UNSIGNED<T>) { return lhs ^= rhs; }
+        friend constexpr BasicInt operator<<(BasicInt lhs, BasicInt rhs) requires(IS_UNSIGNED<T>) { return lhs <<= rhs; }
+        friend constexpr BasicInt operator>>(BasicInt lhs, BasicInt rhs) requires(IS_UNSIGNED<T>) { return lhs >>= rhs; }
 
-        constexpr SafeInt operator-() const ENABLE_IF_SIGNED(IntType) {
-            Assert(m_value != Min);
-            return -m_value; 
-        }
+        constexpr BasicInt & operator+=(BasicInt other) { return *this = *this + other; }
+        constexpr BasicInt & operator-=(BasicInt other) { return *this = *this - other; }
+        constexpr BasicInt & operator/=(BasicInt other) { return *this = *this / other; }
+        constexpr BasicInt & operator*=(BasicInt other) { return *this = *this * other; }
+        constexpr BasicInt & operator%=(BasicInt other) { return *this = *this % other; }
 
-        constexpr SafeInt & operator+=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const IntType result = m_value + rhs.m_value;
-            Assert(result >= m_value);        
-            m_value = result; 
-            return *this; 
-        }
+    private:
+        friend struct UncheckedIntegerArithmetic;
+        friend struct CheckedIntegerArithmetic;
 
-        constexpr SafeInt & operator+=(SafeInt rhs) ENABLE_IF_SIGNED(IntType) { 
-            const bool didOverflow {
-                (rhs.m_value > 0 && m_value > Max - rhs.m_value) ||
-                (rhs.m_value < 0 && m_value < Min - rhs.m_value)
-            };
-            Assert(!didOverflow);
-            m_value += rhs.m_value; 
-            return *this; 
-        }
-
-        constexpr SafeInt & operator-=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const IntType result = m_value - rhs.m_value; 
-            Assert(result <= m_value); // result > m_value -> overflow
-            m_value = result; 
-            return *this;
-        }
-
-        constexpr SafeInt & operator-=(SafeInt rhs) ENABLE_IF_SIGNED(IntType) { 
-            const bool didOverflow {
-                (rhs.m_value < 0 && m_value > Max + rhs.m_value) ||
-                (rhs.m_value > 0 && m_value < Min + rhs.m_value)
-            };
-            Assert(!didOverflow);
-            m_value -= rhs.m_value;  
-            return *this;
-        }
-
-        constexpr SafeInt & operator/=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) {
-            Assert(rhs.m_value != 0);
-            m_value = m_value / rhs.m_value; 
-            return *this;
-        }
-
-        constexpr SafeInt & operator/=(SafeInt rhs) ENABLE_IF_SIGNED(IntType) {
-            const bool didOverflow {
-                rhs.m_value == 0 || (rhs.m_value == -1 && m_value == Min)
-            };
-            Assert(!didOverflow);
-            m_value *= rhs.m_value;
-            return *this; 
-        }
-
-        constexpr SafeInt & operator*=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) {
-            const IntType result = m_value * rhs.m_value;
-            const bool didOverflow = result < m_value && rhs.m_value != 0;
-            Assert(!didOverflow);
-            m_value = result; 
-            return *this;
-        }
-
-        constexpr SafeInt & operator*=(SafeInt rhs) ENABLE_IF_SIGNED(IntType) {
-            const bool didOverflow {
-                (m_value == -1 && rhs.m_value == Min) ||
-                (rhs.m_value == -1 && m_value == Min) ||
-                (rhs.m_value != 0 && m_value > Max / rhs.m_value) ||
-                (rhs.m_value != 0 && m_value < Min / rhs.m_value)
-            };
-            Assert(!didOverflow);
-            m_value *= rhs.m_value; 
-            return *this;
-        }
-
-        constexpr SafeInt operator~() ENABLE_IF_UNSIGNED(IntType) { return ~m_value; }
-        constexpr SafeInt & operator&=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value &= rhs.m_value; return *this; }
-        constexpr SafeInt & operator|=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value |= rhs.m_value; return *this; }
-        constexpr SafeInt & operator^=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { m_value ^= rhs.m_value; return *this; }
-
-        constexpr SafeInt & operator<<=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const bool didOverflow = rhs.m_value >= sizeof(IntType)*8;
-            Assert(!didOverflow);
-            m_value <<= rhs.m_value;
-            return *this;
-        }
-
-        constexpr SafeInt & operator>>=(SafeInt rhs) ENABLE_IF_UNSIGNED(IntType) { 
-            const bool didOverflow = rhs.m_value >= sizeof(IntType)*8;
-            Assert(!didOverflow);
-            m_value >>= rhs.m_value;
-            return *this;
-        }
-
-        FRIEND_COMPARISON_OPERATORS(SafeInt)
-        FRIEND_ARITHMETIC_OPERATORS(SafeInt)
-        FRIEND_BITWISE_OPERATORS(SafeInt, IntType)
-
-        public:
-            using Base::Max;
-            using Base::Min;
+        static constexpr auto max = std::numeric_limits<T>::max();
+        static constexpr auto min = std::numeric_limits<T>::min();
+        static constexpr auto bit_width = std::numeric_limits<T>::digits;
     };
 
-    template <typename IntType>
-    struct Int : public IntBase<IntType> 
+    struct UncheckedIntegerArithmetic
     {
-    private:
-        typedef IntBase<IntType> Base;
-        using Base::m_value;
-        using CType = IntType;
+        template<typename ValueType>
+        static constexpr ValueType Add(ValueType lhs, ValueType rhs){ return lhs + rhs; }
 
-    public:
-        constexpr Int(uint64_t value = 0) ENABLE_IF_UNSIGNED(IntType) : Base(value) {
+        template<typename ValueType>
+        static constexpr ValueType Subtract(ValueType lhs, ValueType rhs){ return lhs - rhs; }
+
+        template<typename ValueType>
+        static constexpr ValueType Multiply(ValueType lhs, ValueType rhs){ return lhs * rhs; }
+
+        template<typename ValueType>
+        static constexpr ValueType Divide(ValueType lhs, ValueType rhs){ return lhs / rhs; }
+
+        template<typename ValueType>
+        static constexpr ValueType Modulo(ValueType lhs, ValueType rhs){ return lhs % rhs; }
+
+        template<typename T>
+        static constexpr T & PreIncrement(T & var){ ++(var.value); return var; }
+
+        template<typename T>
+        static constexpr T & PreDecrement(T & var){ --(var.value); return var; }
+
+        template<typename ValueType>
+        static constexpr ValueType PostIncrement(ValueType & var){ return var++; }
+
+        template<typename ValueType>
+        static constexpr ValueType PostDecrement(ValueType & var){ return var--; }
+
+        template<typename ValueType>
+        static constexpr ValueType UnaryMinus(ValueType var){ return -var; }
+
+        template<typename T>
+        static constexpr T & ShiftLeft(T & lhs, T rhs){ lhs.value <<= rhs.value; return lhs; }
+
+        template<typename T>
+        static constexpr T & ShiftRight(T & lhs, T rhs){ lhs.value >>= rhs.value; return lhs; }
+    };
+
+    struct CheckedIntegerArithmetic
+    {
+        template<IS_UNSIGNED ValueType>
+        static constexpr ValueType Add(ValueType lhs, ValueType rhs)
+        {
+            const ValueType result = lhs + rhs;
+            Assert(result >= lhs);        
+            return result;  
         }
-        constexpr Int(int64_t value = 0) ENABLE_IF_SIGNED(IntType) : Base(value) {
+
+        template<IS_SIGNED ValueType>
+        static constexpr ValueType Add(ValueType lhs, ValueType rhs)
+        {
+            const bool didOverflow = (rhs > 0 && lhs > std::numeric_limits<ValueType>::max() - rhs) || (rhs < 0 && lhs < std::numeric_limits<ValueType>::min() - rhs);
+            Assert(!didOverflow);
+            return lhs + rhs;  
         }
 
-        template <typename Other>
-        requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
-        constexpr operator Int<Other>() const { return static_cast<Other>(m_value); }
+        template<IS_UNSIGNED ValueType>
+        static constexpr ValueType Subtract(ValueType lhs, ValueType rhs)
+        { 
+            Assert(lhs >= rhs);
+            return lhs - rhs; 
+        }
 
-        template <typename Other>
-        requires(sizeof(Other) > sizeof(IntType) && std::is_unsigned_v<IntType> && std::is_signed_v<Other>)
-        constexpr operator Int<Other>() const { return static_cast<Other>(m_value); }
+        template<IS_SIGNED ValueType>
+        static constexpr ValueType Subtract(ValueType lhs, ValueType rhs)
+        {
+            const bool didOverflow = (rhs < 0 && lhs > std::numeric_limits<ValueType>::max() + rhs) || (rhs > 0 && lhs < std::numeric_limits<ValueType>::min() + rhs);
+            Assert(!didOverflow);
+            return lhs - rhs;  
+        }
 
-        template <typename Other>
-        requires(sizeof(Other) >= sizeof(IntType) && std::is_signed_v<IntType> == std::is_signed_v<Other>)
-        constexpr operator SafeInt<Other>() const { return static_cast<Other>(m_value); }
+        template<IS_SIGNED ValueType>
+        static constexpr ValueType Multiply(ValueType lhs, ValueType rhs)
+        { 
+            constexpr auto min = std::numeric_limits<ValueType>::min();
+            constexpr auto max = std::numeric_limits<ValueType>::max();
 
-        template <typename Other>
-        requires(sizeof(Other) > sizeof(IntType) && std::is_unsigned_v<IntType> && std::is_signed_v<Other>)
-        constexpr operator SafeInt<Other>() const { return static_cast<Other>(m_value); }
+            Assert(!(lhs == min && rhs == -1));
+            Assert(!(rhs == min && lhs == -1));
 
-        constexpr Int & operator+=(Int rhs) { m_value += rhs.m_value; return *this;}
-        constexpr Int & operator-=(Int rhs) { m_value -= rhs.m_value; return *this;}
-        constexpr Int & operator/=(Int rhs) { m_value /= rhs.m_value; return *this;}
-        constexpr Int & operator*=(Int rhs) { m_value *= rhs.m_value; return *this;}
-        constexpr Int & operator%=(Int rhs) { m_value %= rhs.m_value; return *this;}
+            if (lhs > 0)
+            {
+                if (rhs > 0) Assert(lhs <= max / rhs);
+                else Assert(lhs <= min / rhs);
+            }
+            else if (lhs < 0)
+            {
+                if (rhs > 0) Assert(lhs >= min / rhs);
+                else Assert(lhs >= max / rhs);
+            }
 
-        constexpr Int & operator++() { ++m_value; return *this; }
-        constexpr Int & operator--() { --m_value; return *this; }
-        constexpr Int operator++(auto) { return m_value++; }
-        constexpr Int operator--(auto) { return m_value--; }
+            return lhs * rhs;
+        }
 
-        constexpr Int operator~() ENABLE_IF_UNSIGNED(IntType) { return ~m_value; }
-        constexpr Int & operator&=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value &= rhs.m_value; return *this; }
-        constexpr Int & operator|=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value |= rhs.m_value; return *this; }
-        constexpr Int & operator^=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value ^= rhs.m_value; return *this; }
-        constexpr Int & operator<<=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value <<= rhs.m_value; return *this; }
-        constexpr Int & operator>>=(Int rhs) ENABLE_IF_UNSIGNED(IntType) { m_value >>= rhs.m_value; return *this; }
+        template<IS_UNSIGNED ValueType>
+        static constexpr ValueType Multiply(ValueType lhs, ValueType rhs)
+        {         
+            if (rhs != 0) Assert(lhs <= (std::numeric_limits<ValueType>::max() / rhs));
+            return lhs * rhs; 
+        }
 
-        FRIEND_COMPARISON_OPERATORS(Int)
-        FRIEND_ARITHMETIC_OPERATORS(Int)
-        FRIEND_BITWISE_OPERATORS(Int, IntType)
+        template<IS_UNSIGNED ValueType>
+        static constexpr ValueType Divide(ValueType lhs, ValueType rhs)
+        { 
+            Assert(rhs != 0);
+            return lhs / rhs;
+        }
 
-        public:
-            using Base::Max;
-            using Base::Min;
+        template<IS_SIGNED ValueType>
+        static constexpr ValueType Divide(ValueType lhs, ValueType rhs)
+        { 
+            const bool didOverflow = (rhs == 0 || (rhs == -1 && lhs == std::numeric_limits<ValueType>::min()));
+            Assert(!didOverflow);
+            return lhs / rhs;
+        }
+
+        template<IS_UNSIGNED ValueType>
+        static constexpr ValueType Modulo(ValueType lhs, ValueType rhs)
+        { 
+            Assert(rhs != 0);
+            return lhs % rhs;
+        }
+
+        template<IS_SIGNED ValueType>
+        static constexpr ValueType Modulo(ValueType lhs, ValueType rhs)
+        { 
+            Assert(rhs != 0);
+            Assert(!(lhs == std::numeric_limits<ValueType>::min() && rhs == -1));
+            return lhs % rhs;
+        }
+
+        template<typename T>
+        static constexpr T & PreIncrement(T & var)
+        {      
+            Assert(var.value != T::max);
+            ++(var.value);
+            return var;
+        }
+
+        template<typename T>
+        static constexpr T & PreDecrement(T & var)
+        {
+            Assert(var.value != T::min);
+            --(var.value);
+            return var; 
+        }
+
+        template<typename ValueType>
+        static constexpr ValueType PostIncrement(ValueType & var)
+        { 
+            Assert(var != std::numeric_limits<ValueType>::max());
+            return var++;
+        }
+
+        template<typename ValueType>
+        static constexpr ValueType PostDecrement(ValueType & var)
+        {
+            Assert(var != std::numeric_limits<ValueType>::min());
+            return var--;
+        }
+
+        template<typename ValueType>
+        static constexpr ValueType UnaryMinus(ValueType var)
+        {
+            Assert(var != std::numeric_limits<ValueType>::min());
+            return -var; 
+        }
+
+        template<typename T>
+        static constexpr T & ShiftLeft(T & lhs, T rhs)
+        {
+            Assert(rhs.value < T::bit_width);
+            Assert(lhs.value <= T::max >> rhs.value);
+            lhs.value <<= rhs.value;
+            return lhs;
+        }
+
+        template<typename T>
+        static constexpr T & ShiftRight(T & lhs, T rhs)
+        {
+            Assert(rhs.value < T::bit_width);
+            lhs.value >>= rhs.value;
+            return lhs;
+        }
     };
 
 }
 
 export namespace NH_NAMESPACE 
 {
-    using Int8 = Int<int8_t>;
-    using Int16 = Int<int16_t>;
-    using Int32 = Int<int32_t>;
-    using Int64 = Int<int64_t>;
-    using UInt8 = Int<uint8_t>;
-    using UInt16 = Int<uint16_t>;
-    using UInt32 = Int<uint32_t>;
-    using UInt64 = Int<uint64_t>;
+    using Int8 = BasicInt<int8_t, UncheckedIntegerArithmetic>;
+    using Int16 = BasicInt<int16_t, UncheckedIntegerArithmetic>;
+    using Int32 = BasicInt<int32_t, UncheckedIntegerArithmetic>;
+    using Int64 = BasicInt<int64_t, UncheckedIntegerArithmetic>;
+    using UInt8 = BasicInt<uint8_t, UncheckedIntegerArithmetic>;
+    using UInt16 = BasicInt<uint16_t, UncheckedIntegerArithmetic>;
+    using UInt32 = BasicInt<uint32_t, UncheckedIntegerArithmetic>;
+    using UInt64 = BasicInt<uint64_t, UncheckedIntegerArithmetic>;
 
-    using SafeInt8 = SafeInt<int8_t>;
-    using SafeInt16 = SafeInt<int16_t>;
-    using SafeInt32 = SafeInt<int32_t>;
-    using SafeInt64 = SafeInt<int64_t>;
-    using SafeUInt8 = SafeInt<uint8_t>;
-    using SafeUInt16 = SafeInt<uint16_t>;
-    using SafeUInt32 = SafeInt<uint32_t>;
-    using SafeUInt64 = SafeInt<uint64_t>;
+    using SafeInt8 = BasicInt<int8_t, CheckedIntegerArithmetic>;
+    using SafeInt16 = BasicInt<int16_t, CheckedIntegerArithmetic>;
+    using SafeInt32 = BasicInt<int32_t, CheckedIntegerArithmetic>;
+    using SafeInt64 = BasicInt<int64_t, CheckedIntegerArithmetic>;
+    using SafeUInt8 = BasicInt<uint8_t, CheckedIntegerArithmetic>;
+    using SafeUInt16 = BasicInt<uint16_t, CheckedIntegerArithmetic>;
+    using SafeUInt32 = BasicInt<uint32_t, CheckedIntegerArithmetic>;
+    using SafeUInt64 = BasicInt<uint64_t, CheckedIntegerArithmetic>;
 
-
-#ifndef USE_64_BIT_PTR_DEFINES
-#    if defined(__LP64__) || defined(_WIN64) || (defined(__x86_64__) && !defined(__ILP32__)) || defined(_M_X64) \
-        || defined(__ia64) || defined(_M_IA64) || defined(__aarch64__) || defined(__powerpc64__)                \
-        || (defined(__riscv) && __riscv_xlen == 64)
-#        define USE_64_BIT_PTR_DEFINES 1
-#    else
-#        define USE_64_BIT_PTR_DEFINES 0
-#    endif
-#endif
-
-#if USE_64_BIT_PTR_DEFINES
-    using Size = UInt64;
-    using SafeSize = SafeUInt64;
-#else 
-    using Size = UInt32;
-    using SafeSize = SafeUInt32;
-#endif
-
-    //auto* operator+(auto * lhs, Size rhs) { return lhs + +rhs; }   \
-    //auto* operator-(auto * lhs, Size rhs) { return lhs - +rhs; }   
-    auto* operator+(auto * lhs, SafeSize rhs) { return lhs + +rhs; }   \
-    auto* operator-(auto * lhs, SafeSize rhs) { return lhs - +rhs; }   
+    template <Int8 I>
+    class A {};
 }
 
 export namespace std {
     template <typename T>
-    struct hash<NH_NAMESPACE::Int<T>> {
-        size_t operator()(const NH_NAMESPACE::Int<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::UncheckedIntegerArithmetic>> {
+        size_t operator()(const NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::UncheckedIntegerArithmetic>& value) const noexcept {
             return +value;
         }
     };
 
     template <typename T>
-    struct hash<NH_NAMESPACE::SafeInt<T>> {
-        size_t operator()(const NH_NAMESPACE::SafeInt<T>& value) const noexcept {
+    struct hash<NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::CheckedIntegerArithmetic>> {
+        size_t operator()(const NH_NAMESPACE::BasicInt<T, NH_NAMESPACE::CheckedIntegerArithmetic>& value) const noexcept {
             return +value;
         }
     };

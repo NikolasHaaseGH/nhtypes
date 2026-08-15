@@ -6,7 +6,9 @@ module;
 
 export module nhtypes:common;
 
-export namespace NH_NAMESPACE {
+import :boolean;
+
+namespace NH_NAMESPACE {
 
     using uint8_t = std::uint8_t; 
     using uint16_t = std::uint16_t;
@@ -19,9 +21,6 @@ export namespace NH_NAMESPACE {
     using int64_t = std::int64_t;
 
     using size_t = std::size_t;
-}
-
-namespace NH_NAMESPACE {
 
     void DebugBreak()
     {
@@ -36,15 +35,27 @@ namespace NH_NAMESPACE {
 #endif
     }
 
-    export inline void Assert(bool condition) { 
-            if(!condition) [[unlikely]]{
+    export inline void Assert(Bool condition) { 
+        if(!condition) [[unlikely]]{
 #if ENABLE_TESTABLE_ASSERTIONS
-                throw 1;
+            throw 1;
 #elif( defined(_DEBUG))
-                DebugBreak();
+            DebugBreak();
 else
-                std::exit(); 
+            std::exit(); 
 #endif
-            }
         }
+    }
+
+    export inline void Assert(bool condition) { 
+        if(!condition) [[unlikely]]{
+#if ENABLE_TESTABLE_ASSERTIONS
+            throw 1;
+#elif( defined(_DEBUG))
+            DebugBreak();
+else
+            std::exit(); 
+#endif
+        }
+    }
 }
