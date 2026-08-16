@@ -20,3 +20,5 @@ import nhtypes;
     }
 
 Make_Safe_Decimal_Tests(nh::SafeFloat, float);
+
+

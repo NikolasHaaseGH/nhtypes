@@ -41,6 +41,8 @@ export namespace NH_NAMESPACE {
         constexpr operator BasicInt<IntType>() { return m_value; }
         */
 
+        constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
+
         friend constexpr Bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return +lhs < +rhs; }
         friend constexpr Bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return +lhs > +rhs; }
         friend constexpr Bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return +lhs >= +rhs; }
@@ -84,7 +86,7 @@ export namespace NH_NAMESPACE {
         static constexpr ValueType Modulo(ValueType lhs, ValueType rhs){ return lhs % rhs; }
 
         template<typename ValueType>
-        static constexpr ValueType UnaryMinus(ValueType var){ return -var; }
+        static constexpr ValueType ChangeSign(ValueType var){ return -var; }
     };
 
     struct CheckedDecimalArithmetic
@@ -131,9 +133,9 @@ export namespace NH_NAMESPACE {
         }
 
         template<Decimal T>
-        static constexpr T UnaryMinus(T value)
+        static constexpr T ChangeSign(T value)
         {
-            return -value;
+            return Check(-value);
         }
     };
 
