@@ -7,11 +7,12 @@ export module test.boolean;
 
 import nhtypes;
 
-TEST_CASE("Test boolean"){
-    SECTION("Create booleans") {
-        nh::Bool a = nh::True;
-        nh::Bool b = nh::False;
+TEST_CASE("Test boolean") {
+  SECTION("Create booleans") {
+    nh::Bool a = nh::True;
+    nh::Bool b = nh::False;
 
-        if(a) {}
+    if (a) {
     }
+  }
 }
