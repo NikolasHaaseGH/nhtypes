@@ -43,10 +43,10 @@ export namespace NH_NAMESPACE {
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
 
-        friend constexpr Bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return +lhs < +rhs; }
-        friend constexpr Bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return +lhs > +rhs; }
-        friend constexpr Bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return +lhs >= +rhs; }
-        friend constexpr Bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return +lhs <= +rhs; }
+        friend constexpr Bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs < +rhs); }
+        friend constexpr Bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs > +rhs); }
+        friend constexpr Bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs >= +rhs); }
+        friend constexpr Bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs <= +rhs); }
 
         friend constexpr BasicDecimal operator+(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Add(lhs.value, rhs.value); }
         friend constexpr BasicDecimal operator-(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Subtract(lhs.value, rhs.value); }
