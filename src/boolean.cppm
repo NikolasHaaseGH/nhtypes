@@ -20,6 +20,8 @@ struct Bool {
 
         explicit inline constexpr Bool(bool value) noexcept : value(static_cast<BooleanValue>(value)) {}
 
+        inline constexpr operator bool() const noexcept { return static_cast<bool>(value); }
+
         inline constexpr Bool(const BooleanValue value = False) noexcept : value(value) {}
 
         inline constexpr Bool & operator &=(Bool rhs) noexcept { value = static_cast<BooleanValue>(static_cast<bool>(value) & static_cast<bool>(rhs.value)); return *this; }
@@ -31,7 +33,6 @@ struct Bool {
 
         inline constexpr Bool operator!() const noexcept { return static_cast<BooleanValue>(!static_cast<bool>(value)); }
 
-        explicit inline constexpr operator bool() const noexcept { return static_cast<bool>(value); }
         inline constexpr bool operator+() const noexcept { return static_cast<bool>(value); }
         
         Bool & operator +=(Bool rhs) = delete;
