@@ -39,11 +39,11 @@ export namespace NH_NAMESPACE {
 export namespace NH_NAMESPACE {
 
     template<typename T>
-    struct is_nh_floatingpoint : std::false_type {};
+    struct is_nh_floating_point : std::false_type {};
 
     template<typename T, typename S>
-    struct is_nh_floatingpoint<BasicDecimal<T, S>> : std::true_type {};
+    struct is_nh_floating_point<BasicDecimal<T, S>> : std::true_type {};
 
     template<typename T>
-    inline constexpr bool is_nh_floatingpoint_v = is_nh_floatingpoint<T>::value;
+    inline constexpr bool is_nh_floating_point_v = is_nh_floating_point<T>::value;
 }
