@@ -17,6 +17,7 @@ set(MODULES
     "src/integers.cppm"
      "src/stream.cppm" 
      "src/hash.cppm" 
+     "src/type_traits.cppm" 
 )
 
 add_library(${PROJECT_NAME})

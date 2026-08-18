@@ -49,6 +49,7 @@ export namespace NH_NAMESPACE {
         friend constexpr Bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs <= +rhs); }
 
         // Dangerous if not tested against some epsilon
+        // We are still providing these so we dont restrict implementations/templates and users are expected to do their own approximation tests.
         friend constexpr Bool operator==(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs == +rhs); }
         friend constexpr Bool operator!=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs != +rhs); }
 
