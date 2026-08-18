@@ -30,6 +30,8 @@ struct Bool {
         
         friend inline constexpr Bool operator==(Bool lhs, Bool rhs)  noexcept { return static_cast<BooleanValue>(+lhs == +rhs); }
         friend inline constexpr Bool operator!=(Bool lhs, Bool rhs) noexcept { return static_cast<BooleanValue>(+lhs != +rhs); }
+        friend inline constexpr Bool operator&&(Bool lhs, Bool rhs) noexcept { return static_cast<BooleanValue>(+lhs && +rhs); }
+        friend inline constexpr Bool operator||(Bool lhs, Bool rhs) noexcept { return static_cast<BooleanValue>(+lhs || +rhs); }
 
         inline constexpr Bool operator!() const noexcept { return static_cast<BooleanValue>(!static_cast<bool>(value)); }
 
