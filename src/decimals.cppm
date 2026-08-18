@@ -28,17 +28,23 @@ export namespace NH_NAMESPACE {
         constexpr T operator+() const noexcept { return value; }
 
         template <typename Other>
-        requires (sizeof(Other) >= sizeof(T))
-        constexpr inline operator BasicDecimal<Other, ArithmeticPolicy>() { return value; }
+        requires (sizeof(Other) <= sizeof(T))
+        constexpr inline BasicDecimal(BasicDecimal<Other, ArithmeticPolicy> other) : value(other.value){}
 
         /*
-        template <typename IntType>
-        requires(sizeof(IntType) * 8 <= std::numeric_limits<T>::digits)
-        constexpr BasicDecimal(BasicInt<IntType> value) : Base(+value) {}
+        template <typename Other>
+        requires (sizeof(Other) >= sizeof(T))
+        constexpr inline operator BasicDecimal<Other, ArithmeticPolicy>() { return value; }
+        */
 
-        template <typename IntType>
+        template <typename IntType, typename S>
+        requires(sizeof(IntType) * 8 <= std::numeric_limits<T>::digits)
+        constexpr BasicDecimal(BasicInt<IntType, S> value) : value(+value) {}
+
+        /*
+        template <typename IntType, typename S>
         requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits)
-        constexpr operator BasicInt<IntType>() { return m_value; }
+        constexpr operator BasicInt<IntType,S>() { return value; }
         */
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
@@ -65,8 +71,8 @@ export namespace NH_NAMESPACE {
         constexpr BasicDecimal & operator*=(BasicDecimal other) { return *this = *this * other; }
         constexpr BasicDecimal & operator%=(BasicDecimal other) { return *this = *this % other; }
 
-    private:
         T value;
+    private:
 
         friend struct UncheckedDecimalArithmetic;
         friend struct CheckedDecimalArithmetic;
