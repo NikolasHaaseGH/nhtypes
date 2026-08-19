@@ -42,7 +42,7 @@ export namespace NH_NAMESPACE {
         constexpr BasicDecimal(BasicInt<IntType, S> value) : value(+value) {}
 
         template <typename IntType, typename S>
-        requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits)
+        requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits && std::is_signed_v<S>)
         explicit constexpr operator BasicInt<IntType,S>() const { return value; }
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
