@@ -43,7 +43,7 @@ export namespace NH_NAMESPACE {
 
         template <typename IntType, typename S>
         requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits)
-        explicit constexpr operator BasicInt<IntType,S>() { return value; }
+        explicit constexpr operator BasicInt<IntType,S>() const { return value; }
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
 
