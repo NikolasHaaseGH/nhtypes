@@ -25,11 +25,11 @@ using namespace nh;
 Make_Safe_Decimal_Tests(nh::SafeFloat, float);
 
 TEST_CASE("Test conversions") {
-    Int16 i = 5;
+    Int32 i = 5;
     Float f = 2;
     Double d = 2;
     //double d = 2;
-    auto a = i * f;
+    auto a = 2 * f;
     std::cout << "Type: " << typeid(a.value).name() << std::endl;
 
 }
