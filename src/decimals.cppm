@@ -31,18 +31,12 @@ export namespace NH_NAMESPACE {
         requires (sizeof(Other) <= sizeof(T))
         constexpr inline BasicDecimal(BasicDecimal<Other, ArithmeticPolicy> other) : value(other.value){}
 
-        /*
-        template <typename Other>
-        requires (sizeof(Other) >= sizeof(T))
-        constexpr inline operator BasicDecimal<Other, ArithmeticPolicy>() { return value; }
-        */
-
         template <typename IntType, typename S>
-        requires(sizeof(IntType) * 8 <= std::numeric_limits<T>::digits)
+        requires(sizeof(IntType) * 8 <= std::numeric_limits<T>::digits  && std::is_signed_v<IntType>)
         constexpr BasicDecimal(BasicInt<IntType, S> value) : value(+value) {}
 
         template <typename IntType, typename S>
-        requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits && std::is_signed_v<S>)
+        requires(sizeof(IntType) * 8 >= std::numeric_limits<T>::digits && std::is_signed_v<IntType>)
         explicit constexpr operator BasicInt<IntType,S>() const { return value; }
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
