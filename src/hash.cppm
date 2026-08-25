@@ -1,9 +1,8 @@
 module;
 
-#include <sstream> 
-
 export module nhtypes:hash;
 
+import std;
 import :integers;
 import :decimals;
 

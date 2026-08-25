@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 4.0.1)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD
+    f35a9ac6-8463-4d38-8eec-5d6008153e7d)
+
 project(
   nhtypes
   VERSION 1.0
@@ -40,4 +43,6 @@ if(BUILD_TESTS)
     add_compile_definitions(ENABLE_TESTABLE_ASSERTIONS)
   add_subdirectory(tests)
 endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23 CXX_MODULE_STD 1)
 

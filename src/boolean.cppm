@@ -1,13 +1,12 @@
 module;
 
-#include <functional>
-
 export module nhtypes:boolean;
 
+import std;
 
 export namespace NH_NAMESPACE {
 
-enum class BooleanValue : uint8_t {
+enum class BooleanValue : std::uint8_t {
     False = 0,
     True = 1
 };
@@ -59,14 +58,5 @@ struct Bool {
         Bool operator >=(Bool rhs) = delete;
         Bool operator <=(Bool rhs) = delete;
         auto operator <=>(Bool rhs) = delete;        
-    };
-}
-
-export namespace std {
-    template <>
-    struct hash<NH_NAMESPACE::Bool> {
-        size_t operator()(const NH_NAMESPACE::Bool & value) const {
-            return +value;
-        }
     };
 }

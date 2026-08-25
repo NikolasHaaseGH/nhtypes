@@ -1,11 +1,8 @@
 module;
 
-#include <functional>
-#include <limits>
-#include <cmath>
-
 export module nhtypes:decimals;
 
+import std;
 import :common;
 import :integers;
 import :boolean;
@@ -141,9 +138,4 @@ export namespace NH_NAMESPACE {
             return Check(-value);
         }
     };
-
-    using Float = BasicDecimal<float, UncheckedDecimalArithmetic>;
-    using Double = BasicDecimal<double, UncheckedDecimalArithmetic>;
-    using SafeFloat = BasicDecimal<float, CheckedDecimalArithmetic>;
-    using SafeDouble = BasicDecimal<double, CheckedDecimalArithmetic>;
 }

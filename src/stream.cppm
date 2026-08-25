@@ -1,9 +1,8 @@
 module;
 
-#include <sstream> 
-
 export module nhtypes.stream;
 
+import std;
 import nhtypes;
 
 export namespace NH_NAMESPACE {

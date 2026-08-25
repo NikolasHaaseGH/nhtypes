@@ -1,11 +1,9 @@
 module;
 
-#include <cstdint>
-#include <cstddef>
-#include <cassert>
 
 export module nhtypes:common;
 
+import std;
 import :boolean;
 
 namespace NH_NAMESPACE {

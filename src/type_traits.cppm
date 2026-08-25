@@ -1,9 +1,8 @@
 module;
 
-#include <type_traits>
-
 export module nhtypes.type_traits;
 
+import std;
 import nhtypes;
 
 export namespace NH_NAMESPACE {
