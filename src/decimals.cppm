@@ -38,15 +38,15 @@ export namespace NH_NAMESPACE {
 
         constexpr T operator-() const noexcept { return ArithmeticPolicy::ChangeSign(value); }
 
-        friend constexpr Bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs < +rhs); }
-        friend constexpr Bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs > +rhs); }
-        friend constexpr Bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs >= +rhs); }
-        friend constexpr Bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs <= +rhs); }
+        friend constexpr bool operator<(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs < +rhs); }
+        friend constexpr bool operator>(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs > +rhs); }
+        friend constexpr bool operator>=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs >= +rhs); }
+        friend constexpr bool operator<=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs <= +rhs); }
 
         // Dangerous if not tested against some epsilon
         // We are still providing these so we dont restrict implementations/templates and users are expected to do their own approximation tests.
-        friend constexpr Bool operator==(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs == +rhs); }
-        friend constexpr Bool operator!=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<Bool>(+lhs != +rhs); }
+        friend constexpr bool operator==(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs == +rhs); }
+        friend constexpr bool operator!=(BasicDecimal lhs, BasicDecimal rhs) { return static_cast<bool>(+lhs != +rhs); }
 
         friend constexpr BasicDecimal operator+(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Add(lhs.value, rhs.value); }
         friend constexpr BasicDecimal operator-(BasicDecimal lhs, BasicDecimal rhs) { return ArithmeticPolicy::Subtract(lhs.value, rhs.value); }
