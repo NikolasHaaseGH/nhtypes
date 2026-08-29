@@ -93,11 +93,11 @@ export namespace NH_NAMESPACE {
 
         template<typename Pointer>
         requires(std::is_pointer_v<Pointer> && IS_UNSIGNED<T>)
-        friend constexpr Pointer operator+(Pointer lhs, BasicInt rhs) { return lhs + rhs; }
+        friend constexpr Pointer operator+(Pointer lhs, BasicInt rhs) { return lhs + rhs.value; }
 
         template<typename Pointer>
         requires(std::is_pointer_v<Pointer> && IS_UNSIGNED<T>)
-        friend constexpr Pointer operator-(Pointer lhs, BasicInt rhs) { return lhs - rhs; }
+        friend constexpr Pointer operator-(Pointer lhs, BasicInt rhs) { return lhs - rhs.value; }
 
 
     private:
