@@ -91,6 +91,15 @@ export namespace NH_NAMESPACE {
         constexpr BasicInt & operator*=(BasicInt other) { return *this = *this * other; }
         constexpr BasicInt & operator%=(BasicInt other) { return *this = *this % other; }
 
+        template<typename Pointer>
+        requires(std::is_pointer_v<Pointer> && IS_UNSIGNED<T>)
+        friend constexpr Pointer operator+(Pointer lhs, BasicInt rhs) { return lhs + rhs; }
+
+        template<typename Pointer>
+        requires(std::is_pointer_v<Pointer> && IS_UNSIGNED<T>)
+        friend constexpr Pointer operator-(Pointer lhs, BasicInt rhs) { return lhs - rhs; }
+
+
     private:
         friend struct UncheckedIntegerArithmetic;
         friend struct CheckedIntegerArithmetic;
