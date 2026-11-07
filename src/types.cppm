@@ -10,7 +10,7 @@ export import :integers;
 export import :decimals;
 export import :hash;
 
-export namespace nh {
+export namespace NH_NAMESPACE {
 
     /************* Integers **************/
     using Int8 = BasicInt<std::int8_t, UncheckedIntegerArithmetic>;
